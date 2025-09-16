@@ -2,7 +2,7 @@
 import { ref, onMounted, watch } from 'vue';
 import axios from 'axios';
 
-const apiUrl = 'https://script.google.com/macros/s/AKfycbxhIy3tfOItHh6ChO1XSXBeYO4d8dBKyuOGD-pPgrGKzlXhGLbKrARWtiba1DOUt22G/exec'; // <-- GANTI DENGAN URL ANDA
+const apiUrl = 'https://script.google.com/macros/s/AKfycbxCribBpgD2MMag87zZ4vXP7qQRjLlsEqm4sobhGAMK8TAr-piwYasOqAIzOBGEWC0u/exec'; // <-- GANTI DENGAN URL ANDA
 
 const reportData = ref(null);
 const isLoading = ref(true);
@@ -128,42 +128,85 @@ const divisiHeaders = [ 'IT',
 </template>
 
 <style scoped>
+/* Styling Kartu Utama */
+.card {
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.card-title {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: var(--primary-color, #004d8c);
+}
+
+/* Styling untuk Filter Dropdown */
 .filter-controls {
   display: flex;
   gap: 1rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 6px;
 }
 .filter-controls select {
-  padding: 0.5rem;
-  border-radius: 4px;
+  padding: 0.75rem;
+  border-radius: 6px;
   border: 1px solid #ccc;
+  font-size: 1rem;
+  font-weight: 500;
 }
+
+/* Wrapper agar tabel bisa di-scroll horizontal */
 .table-wrapper {
   overflow-x: auto;
 }
+
+/* Styling Tabel */
 table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.9rem;
 }
 th, td {
-  border: 1px solid #ddd;
-  padding: 8px;
+  border: 1px solid #dee2e6;
+  padding: 8px 10px;
   text-align: center;
-  white-space: nowrap;
+  white-space: nowrap; /* Agar teks tidak turun baris */
 }
-th {
+thead th {
   background-color: #f2f2f2;
+  font-weight: 600;
 }
+tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+/* Styling untuk Footer Tabel (Ringkasan) */
 tfoot td {
   font-weight: bold;
-}
-.summary-label {
-  text-align: right;
-  background-color: #f8f9fa;
-}
-.summary-value {
   background-color: #e9ecef;
 }
-/* ... (style lain yang relevan) ... */
+tfoot .summary-label {
+  text-align: right;
+  background-color: #f8f9fa;
+  padding-right: 1rem;
+}
+tfoot .summary-value {
+  color: var(--primary-color, #004d8c);
+  font-size: 1.1em;
+}
+
+/* Loading & Error State */
+.loading-state, .error-state {
+  text-align: center;
+  padding: 2rem;
+  font-size: 1.1rem;
+  color: #777;
+}
+.error-state {
+  color: #d32f2f;
+}
 </style>

@@ -3,7 +3,7 @@ import { ref, onMounted, computed } from 'vue';
 import axios from 'axios';
 
 // PASTE URL WEB APP ANDA DARI HASIL DEPLOY TERAKHIR
-const apiUrl = 'https://script.google.com/macros/s/AKfycbxhIy3tfOItHh6ChO1XSXBeYO4d8dBKyuOGD-pPgrGKzlXhGLbKrARWtiba1DOUt22G/exec';
+const apiUrl = 'https://script.google.com/macros/s/AKfycbxCribBpgD2MMag87zZ4vXP7qQRjLlsEqm4sobhGAMK8TAr-piwYasOqAIzOBGEWC0u/exec';
 
 // --- [FINAL] KONFIGURASI TABEL YANG AKURAT ---
 // Key di sini sudah dicocokkan dengan header asli Anda setelah dibersihkan oleh Apps Script
