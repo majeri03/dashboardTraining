@@ -4,7 +4,7 @@ defineProps({
   activeView: String
 });
 
-const emit = defineEmits(['navigate']);
+const emit = defineEmits(['navigate', 'close']);
 
 const navigateTo = (view) => {
   emit('navigate', view);
@@ -23,12 +23,12 @@ const menuItems = [
   },
   {
     name: 'LaporanPelaksanaan',
-    label: 'Lap. Pelaksanaan',
+    label: 'Lap. Internal Training',
     icon: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C6.095 4.01 5.25 4.973 5.25 6.108V18.75c0 1.243.87 2.25 1.969 2.25H18A2.25 2.25 0 0020.25 18.75V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08" /></svg>`
   },
   {
     name: 'LaporanEvaluasi',
-    label: 'Lap. Evaluasi',
+    label: 'Lap. External Training',
     icon: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6a7.5 7.5 0 100 15 7.5 7.5 0 000-15zM21 21l-5.197-5.197" /></svg>`
   },
   {
@@ -44,6 +44,11 @@ const menuItems = [
     <div class="sidebar-header">
       <img src="/images/logo.png" alt="Logo Bosowa" class="logo">
       <h3 class="logo-title">Training Center</h3>
+      <button class="close-menu" @click="$emit('close')">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:24px; height:24px;">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
     </div>
     <nav class="sidebar-nav">
       <a v-for="item in menuItems"
@@ -66,17 +71,17 @@ const menuItems = [
   color: var(--sidebar-text, #9CA3AF);
   display: flex;
   flex-direction: column;
-  padding: 1.5rem 1rem;
   transition: width 0.3s ease;
+  box-shadow: 5px 0 10px -2px rgba(59, 88, 255, 0.5);
 }
 
 .sidebar-header {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding-bottom: 1.5rem;
-  margin-bottom: 1rem;
-  border-bottom: 1px solid #374151;
+  border-bottom: 1px solid var(--border-color, #e5e7eb);
+  background-color: #ffffff; /* <-- TAMBAHKAN INI */
+  padding: 1.5rem;            /* <-- UBAH INI */
 }
 
 .logo {
@@ -85,7 +90,7 @@ const menuItems = [
 }
 
 .logo-title {
-  color: #FFFFFF;
+  color: #111827; /* <-- UBAH WARNA TEKS JADI GELAP */
   margin: 0;
   font-size: 1.25rem;
   font-weight: 600;
@@ -95,6 +100,7 @@ const menuItems = [
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  padding: 1.5rem 1rem;
 }
 
 .nav-link {
@@ -103,10 +109,11 @@ const menuItems = [
   gap: 0.75rem;
   padding: 0.75rem 1rem;
   border-radius: 8px;
-  color: var(--sidebar-text, #9CA3AF);
+  color: var(--sidebar-text, #ffffff);
   text-decoration: none;
   font-weight: 500;
   transition: background-color 0.2s, color 0.2s;
+  
 }
 
 .nav-link:hover {
@@ -119,6 +126,7 @@ const menuItems = [
   color: #FFFFFF;
   font-weight: 600;
   box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  box-shadow: 0 0 8px rgba(255, 59, 59, 0.7), 0 0 12px rgba(255, 59, 59, 0.5);
 }
 
 /* Mengatur style ikon SVG */
@@ -130,6 +138,32 @@ const menuItems = [
 
 .nav-text {
   white-space: nowrap;
+}
+
+.sidebar-header {
+  position: relative; /* Diperlukan untuk posisi tombol close */
+}
+
+.close-menu {
+  display: none; /* Sembunyi di desktop */
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+}
+.close-menu svg {
+  width: 24px;
+  height: 24px;
+  color: #9CA3AF;
+}
+
+@media (max-width: 768px) {
+  .close-menu {
+    display: block; /* Tampil di mobile */
+  }
 }
 
 </style>

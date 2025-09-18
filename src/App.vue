@@ -15,6 +15,8 @@ const views = {
   InputAbsensi,
 };
 
+const isSidebarOpen = ref(false);
+
 const activeView = shallowRef(Dashboard);
 const activeViewName = ref('Dashboard');
 
@@ -22,13 +24,23 @@ const handleNavigation = (viewName) => {
   activeView.value = views[viewName];
   activeViewName.value = viewName;
 };
+
+const toggleSidebar = () => {
+  isSidebarOpen.value = !isSidebarOpen.value;
+};
+
 </script>
 
 <template>
-  <div id="app-layout">
-    <Sidebar @navigate="handleNavigation" :active-view="activeViewName" />
-    
-    <main class="main-content">
+  <div id="app-layout" :class="{ 'sidebar-mobile-open': isSidebarOpen }">
+  <Sidebar @navigate="handleNavigation" :active-view="activeViewName" @close="toggleSidebar" />
+  <div v-if="isSidebarOpen" class="sidebar-overlay" @click="toggleSidebar"></div>
+  <main class="main-content">
+      <button class="hamburger-menu" @click="toggleSidebar">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:24px; height:24px;">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+        </svg>
+      </button>
       <KeepAlive>
         <component :is="activeView" />
       </KeepAlive>
@@ -40,11 +52,11 @@ const handleNavigation = (viewName) => {
 /* Style global Anda tidak berubah */
 :root {
   --primary-color: #d10000;
-  --secondary-color: #F97316;
-  --sidebar-bg:#111827; /* Warna sidebar baru yang lebih gelap */
-  --sidebar-text: #9CA3AF;
+  --secondary-color: #000a9bffff;
+  --sidebar-bg:rgb(5, 39, 114); /* Warna sidebar baru yang lebih gelap */
+  --sidebar-text: #ffffff;
   --sidebar-text-hover: #FFFFFF;
-  --sidebar-active-bg: #374151;
+  --sidebar-active-bg: #ff6464;
   --bg-color: #ffffff;
   --text-color: #374151;
   --border-color: #e5e7eb;
@@ -88,26 +100,60 @@ th, td {
 th { font-weight: 700; color: var(--primary-color); }
 td a { color: var(--primary-color); text-decoration: none; font-weight: 500; }
 
-/* Desain Responsif */
+.hamburger-menu {
+  display: none;
+}
+
+.sidebar-overlay {
+  display: none;
+}
+
 @media (max-width: 768px) {
   #app-layout {
-    grid-template-columns: 1fr; /* Ubah layout menjadi satu kolom */
-    grid-template-rows: auto 1fr; /* Sidebar di atas, konten di bawah */
-    height: auto;
+    grid-template-columns: 1fr;
   }
-  .sidebar {
-    /* Style sidebar di mobile bisa disesuaikan, misal jadi bar horizontal */
-    flex-direction: row;
-    justify-content: center;
+
+  .hamburger-menu {
+    display: block;
+    position: absolute;
+    top: 1.5rem;
+    left: 1.5rem;
+    z-index: 50;
+    background-color: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 0.5rem;
+    cursor: pointer;
   }
-  .sidebar-header { display: none; }
-  .sidebar-nav { display: flex; gap: 0.5rem; }
-  .sidebar-nav a { font-size: 0.8rem; padding: 0.5rem; }
   
-  /* Responsive Table */
-  table thead { display: none; }
-  table tr { display: block; margin-bottom: 1rem; border: 1px solid var(--border-color); }
-  table td { display: block; text-align: right; border-bottom: 1px dotted var(--border-color); }
-  table td::before { content: attr(data-label); float: left; font-weight: bold; }
+  .main-content {
+    padding-top: 5rem;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 100;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  #app-layout.sidebar-mobile-open .sidebar {
+    transform: translateX(0);
+  }
+
+  .sidebar-overlay {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 99;
+  }
+
 }
 </style>

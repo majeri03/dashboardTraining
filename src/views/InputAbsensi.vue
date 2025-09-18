@@ -210,7 +210,7 @@ button {
   padding: 1rem;
   border: none;
   border-radius: 6px;
-  background-color: var(--primary-color, #5356FF);
+  background-color: var(--primary-color, #ff5353);
   color: white;
   font-size: 1rem;
   font-weight: 600;
@@ -218,7 +218,7 @@ button {
   transition: background-color 0.2s;
 }
 button:hover { background-color: #4346e0; }
-button:disabled { background-color: #a5b4fc; cursor: not-allowed; }
+button:disabled { background-color: #ff8a8a; cursor: not-allowed; }
 .feedback {
   margin-top: 1rem;
   padding: 1rem;
