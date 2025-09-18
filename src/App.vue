@@ -5,12 +5,14 @@ import Dashboard from './views/Dashboard.vue';
 import LaporanPelaksanaan from './views/LaporanPelaksanaan.vue';
 import LaporanEvaluasi from './views/LaporanEvaluasi.vue';
 import LaporanDetail from './views/LaporanDetail.vue';
+import InputAbsensi from './views/InputAbsensi.vue';
 // Membuat peta komponen untuk pemanggilan dinamis
 const views = {
   Dashboard,
   LaporanPelaksanaan,
   LaporanEvaluasi,
   LaporanDetail,
+  InputAbsensi,
 };
 
 const activeView = shallowRef(Dashboard); // State untuk komponen yang aktif
