@@ -17,6 +17,7 @@ const yearlyTrendData = ref(null);
 const isLoading = ref(true);
 const error = ref(null);
 
+const dynamicMonthYear = ref(''); 
 // --- Computed Properties untuk Mengolah Data ---
 
 const kpiMetrics = computed(() => {
@@ -89,6 +90,9 @@ const fetchAllDashboardData = async () => {
     const year = now.getFullYear();
     const month = now.getMonth() + 1;
 
+    const monthName = now.toLocaleString('id-ID', { month: 'long' });
+    dynamicMonthYear.value = `${monthName} ${year}`;
+
     // Ambil data detail bulan ini dan data tren tahunan secara bersamaan
     const [monthlyResponse, yearlyResponse] = await Promise.all([
       axios.get(apiUrl, { params: { action: 'detailRekap', month, year } }),
@@ -121,9 +125,9 @@ onMounted(fetchAllDashboardData);
 
     <div v-if="!isLoading && monthlyData && yearlyTrendData">
       <div class="kpi-grid">
-        <KpiCard title="Total Peserta Bulan Ini" :value="kpiMetrics.totalPeserta" :icon="iconPeserta" color="#5356FF" />
-        <KpiCard title="Total Jam Training" :value="kpiMetrics.totalJam" unit="Jam" :icon="iconJam" color="#378CE7" />
-        <KpiCard title="Pencapaian Target" :value="kpiMetrics.pencapaian" :icon="iconPencapaian" color="#10B981" />
+        <KpiCard :title="`Total Peserta - ${dynamicMonthYear}`" :value="kpiMetrics.totalPeserta" :icon="iconPeserta" color="#5356FF" />
+        <KpiCard :title="`Total Jam Training - ${dynamicMonthYear}`" :value="kpiMetrics.totalJam" unit="Jam" :icon="iconJam" color="#378CE7" />
+        <KpiCard :title="`Pencapaian Target - ${dynamicMonthYear}`" :value="kpiMetrics.pencapaian" :icon="iconPencapaian" color="#10B981" />
       </div>
 
       <div class="dashboard-grid">

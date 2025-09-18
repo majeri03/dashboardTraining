@@ -1,12 +1,12 @@
 <script setup>
-import { ref, shallowRef } from 'vue'; // shallowRef lebih optimal untuk komponen
+import { ref, shallowRef } from 'vue';
 import Sidebar from './components/Sidebar.vue';
 import Dashboard from './views/Dashboard.vue';
 import LaporanPelaksanaan from './views/LaporanPelaksanaan.vue';
 import LaporanEvaluasi from './views/LaporanEvaluasi.vue';
 import LaporanDetail from './views/LaporanDetail.vue';
 import InputAbsensi from './views/InputAbsensi.vue';
-// Membuat peta komponen untuk pemanggilan dinamis
+
 const views = {
   Dashboard,
   LaporanPelaksanaan,
@@ -15,8 +15,8 @@ const views = {
   InputAbsensi,
 };
 
-const activeView = shallowRef(Dashboard); // State untuk komponen yang aktif
-const activeViewName = ref('Dashboard'); // State untuk nama view
+const activeView = shallowRef(Dashboard);
+const activeViewName = ref('Dashboard');
 
 const handleNavigation = (viewName) => {
   activeView.value = views[viewName];
@@ -26,7 +26,7 @@ const handleNavigation = (viewName) => {
 
 <template>
   <div id="app-layout">
-    <Sidebar @navigate="handleNavigation" />
+    <Sidebar @navigate="handleNavigation" :active-view="activeViewName" />
     
     <main class="main-content">
       <KeepAlive>
@@ -35,34 +35,33 @@ const handleNavigation = (viewName) => {
     </main>
   </div>
 </template>
+
 <style>
-/* Style Global untuk Aplikasi */
+/* Style global Anda tidak berubah */
 :root {
---primary-color: #3B82F6; /* Biru yang lebih modern */
-  --secondary-color: #F97316; /* Oranye */
-  --green-color: #10B981; /* Hijau */
-  --purple-color: #8B5CF6; /* Ungu */
-  --red-color: #EF4444; /* Merah */
-  
-  --bg-color: #ffffff; /* Latar belakang abu-abu sangat terang */
-  --text-color: #374151; /* Warna teks gelap */
-  --border-color: #e5e7eb; /* Warna border yang lembut */
+  --primary-color: #d10000;
+  --secondary-color: #F97316;
+  --sidebar-bg:#111827; /* Warna sidebar baru yang lebih gelap */
+  --sidebar-text: #9CA3AF;
+  --sidebar-text-hover: #FFFFFF;
+  --sidebar-active-bg: #374151;
+  --bg-color: #ffffff;
+  --text-color: #374151;
+  --border-color: #e5e7eb;
 }
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   background-color: var(--bg-color);
   margin: 0;
 }
-
-/* Layout Utama Dashboard */
 #app-layout {
   display: grid;
-  grid-template-columns: 250px 1fr; /* Sidebar 250px, sisa untuk konten */
+  grid-template-columns: 250px 1fr;
   height: 100vh;
 }
 .main-content {
   padding: 2rem;
-  overflow-y: auto; /* Agar konten bisa di-scroll jika panjang */
+  overflow-y: auto;
 }
 
 /* Style umum untuk Card dan Tabel yang bisa digunakan di semua view */
