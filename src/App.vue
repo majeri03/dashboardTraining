@@ -4,14 +4,12 @@ import Sidebar from './components/Sidebar.vue';
 import Dashboard from './views/Dashboard.vue';
 import LaporanPelaksanaan from './views/LaporanPelaksanaan.vue';
 import LaporanEvaluasi from './views/LaporanEvaluasi.vue';
-import Rekapitulasi from './views/Rekapitulasi.vue';
 import LaporanDetail from './views/LaporanDetail.vue';
 // Membuat peta komponen untuk pemanggilan dinamis
 const views = {
   Dashboard,
   LaporanPelaksanaan,
   LaporanEvaluasi,
-  Rekapitulasi,
   LaporanDetail,
 };
 
@@ -38,9 +36,15 @@ const handleNavigation = (viewName) => {
 <style>
 /* Style Global untuk Aplikasi */
 :root {
-  --primary-color: #004d8c;
-  --bg-color: #f4f6f8;
-  --border-color: #e0e0e0;
+--primary-color: #3B82F6; /* Biru yang lebih modern */
+  --secondary-color: #F97316; /* Oranye */
+  --green-color: #10B981; /* Hijau */
+  --purple-color: #8B5CF6; /* Ungu */
+  --red-color: #EF4444; /* Merah */
+  
+  --bg-color: #ffffff; /* Latar belakang abu-abu sangat terang */
+  --text-color: #374151; /* Warna teks gelap */
+  --border-color: #e5e7eb; /* Warna border yang lembut */
 }
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -62,9 +66,11 @@ body {
 /* Style umum untuk Card dan Tabel yang bisa digunakan di semua view */
 .card {
   background-color: #ffffff;
-  border-radius: 8px;
+  border-radius: 12px; /* Sedikit lebih bulat */
   padding: 1.5rem;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  /* Bayangan yang lebih lembut dan modern */
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  border: 1px solid var(--border-color); /* Border lembut sebagai tambahan */
 }
 .card-title { margin-top: 0; }
 .table-wrapper { overflow-x: auto; }

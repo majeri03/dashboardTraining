@@ -1,0 +1,190 @@
+<script setup>
+import { ref, onMounted, computed } from 'vue';
+import axios from 'axios';
+import BarChart from '../components/BarChart.vue';
+import KpiCard from '../components/KpiCard.vue';
+import DoughnutChart from '../components/DoughnutChart.vue';
+import LineChart from '../components/LineChart.vue';
+
+const iconPeserta = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m-7.5-2.962A3.375 3.375 0 0 1 12 15.75c1.242 0 2.37-.626 3-1.58M12 9.75a3.375 3.375 0 0 1-3.375 3.375A3.375 3.375 0 0 1 5.25 9.75c0-1.856 1.504-3.375 3.375-3.375S12 7.894 12 9.75ZM6.375 12a.75.75 0 0 1 .75-.75h.008a.75.75 0 0 1 .75.75v.008a.75.75 0 0 1-.75.75h-.008a.75.75 0 0 1-.75-.75v-.008Zm4.5 0a.75.75 0 0 1 .75-.75h.008a.75.75 0 0 1 .75.75v.008a.75.75 0 0 1-.75.75h-.008a.75.75 0 0 1-.75-.75v-.008Zm4.5 0a.75.75 0 0 1 .75-.75h.008a.75.75 0 0 1 .75.75v.008a.75.75 0 0 1-.75.75h-.008a.75.75 0 0 1-.75-.75v-.008Z" /></svg>`;
+const iconJam = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>`;
+const iconPencapaian = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" /></svg>`;
+const apiUrl = import.meta.env.VITE_API_URL;
+
+// State untuk menampung data mentah dan status loading
+const dashboardData = ref(null);
+const isLoading = ref(true);
+const error = ref(null);
+
+// --- Computed Properties untuk Mengolah Data Menjadi Grafik ---
+
+// 1. Data untuk Grafik Batang (Peserta per Divisi)
+const pesertaPerDivisiChart = computed(() => {
+  if (!dashboardData.value) return null;
+  const rekap = {};
+  dashboardData.value.trainings.forEach(training => {
+    for (const div in training.rincianDivisi) {
+      if (!rekap[div]) rekap[div] = 0;
+      rekap[div] += training.rincianDivisi[div].peserta;
+    }
+  });
+  return {
+    labels: Object.keys(rekap),
+    datasets: [{
+      label: 'Jumlah Peserta',
+       backgroundColor: [
+          '#5356FF', '378CE7', '#67C6E3', '#DFF5FF', '#ACE2E1', '#387ADF', '#387ADF'
+        ],
+        borderRadius: 4,
+      data: Object.values(rekap),
+    }],
+  };
+});
+
+// 2. Data untuk Kartu KPI
+const kpiMetrics = computed(() => {
+  if (!dashboardData.value) return null;
+  const summary = dashboardData.value.summary;
+  const totalPeserta = dashboardData.value.trainings.reduce((sum, t) => sum + t.jumlahPeserta, 0);
+  return {
+    totalPeserta: totalPeserta,
+    totalJam: summary.totalJamBulanan.toFixed(1),
+    pencapaian: summary.pencapaian,
+  };
+});
+
+// 3. Data untuk Grafik Donat (Internal vs Eksternal)
+const intExtChart = computed(() => {
+  if (!dashboardData.value) return null;
+  let internalCount = 0;
+  let externalCount = 0;
+  dashboardData.value.trainings.forEach(t => {
+    if (t.extInt.toLowerCase().includes('int')) {
+      internalCount++;
+    } else {
+      externalCount++;
+    }
+  });
+  return {
+    labels: ['Internal', 'Eksternal'],
+    datasets: [{
+      backgroundColor: ['#40A2E3', '#BBE2EC'], 
+      data: [internalCount, externalCount],
+      borderWidth: 0,
+    }]
+  };
+});
+
+
+// Fungsi untuk mengambil data dari API
+const getDashboardData = async () => {
+  isLoading.value = true;
+  error.value = null;
+  try {
+    const now = new Date();
+    const params = { action: 'detailRekap', month: now.getMonth() + 1, year: now.getFullYear() };
+    const response = await axios.get(apiUrl, { params });
+    dashboardData.value = response.data;
+  } catch (err) {
+    error.value = "Gagal memuat data dashboard.";
+    console.error(err);
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+onMounted(getDashboardData);
+</script>
+
+<template>
+  <div>
+    <div class="header">
+      <h1 class="header-title">Dashboard Training</h1>
+      <p class="header-subtitle">Ringkasan Data Training Bulan Ini</p>
+    </div>
+
+    <div v-if="isLoading">Memuat data dashboard...</div>
+    <div v-if="error">{{ error }}</div>
+
+    <div v-if="dashboardData">
+      <div class="kpi-grid">
+        <KpiCard title="Total Peserta Bulan Ini" :value="kpiMetrics.totalPeserta" :icon="iconPeserta" color="#3B82F6" />
+        <KpiCard title="Total Jam Training" :value="kpiMetrics.totalJam" unit="Jam" :icon="iconJam" color="#F97316" />
+        <KpiCard title="Pencapaian Target Bulan Ini" :value="kpiMetrics.pencapaian" :icon="iconPencapaian" color="#10B981" />
+      </div>
+
+      <div class="dashboard-grid">
+        <div class="card large-card">
+          <h2 class="card-title">Peserta per Divisi</h2>
+          <div class="chart-container">
+            <BarChart v-if="pesertaPerDivisiChart" :chart-data="pesertaPerDivisiChart" />
+          </div>
+        </div>
+        
+        <div class="card">
+          <h2 class="card-title">Tipe Training</h2>
+          <div class="chart-container">
+            <DoughnutChart v-if="intExtChart" :chart-data="intExtChart" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</template>
+
+<style scoped>
+.header {
+  margin-bottom: 2rem;
+}
+.header-title {
+  margin: 0;
+  color: var(--primary-color);
+}
+.header-subtitle {
+  margin: 0;
+  color: #6c757d;
+}
+
+/* Grid untuk KPI di bagian atas */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+/* Grid utama untuk grafik */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Membuat kartu grafik batang lebih besar di layar lebar */
+@media (min-width: 992px) {
+  .dashboard-grid {
+    grid-template-columns: 2fr 1fr; /* Rasio 2:1 */
+  }
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+.card-title {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+/* Kontainer untuk memastikan grafik mengisi ruang kartu */
+.chart-container {
+  position: relative;
+  height: 300px;
+  flex-grow: 1;
+}
+</style>

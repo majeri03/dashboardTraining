@@ -4,7 +4,7 @@ import axios from 'axios';
 import ProgressBar from '../components/ProgressBar.vue';
 
 // PASTE URL WEB APP ANDA DARI HASIL DEPLOY TERAKHIR
-const apiUrl = 'https://script.google.com/macros/s/AKfycbxCribBpgD2MMag87zZ4vXP7qQRjLlsEqm4sobhGAMK8TAr-piwYasOqAIzOBGEWC0u/exec';
+const apiUrl = import.meta.env.VITE_API_URL;
 
 // --- [FINAL] KONFIGURASI TABEL YANG AKURAT ---
 const tableHeaders = ref([

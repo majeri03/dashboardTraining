@@ -17,7 +17,6 @@ const navigateTo = (view) => {
       <a href="#" @click.prevent="navigateTo('LaporanPelaksanaan')">Laporan Pelaksanaan</a>
       <a href="#" @click.prevent="navigateTo('LaporanEvaluasi')">Laporan Evaluasi</a>
       <a href="#" @click.prevent="navigateTo('LaporanDetail')">Laporan Detail</a>
-      <a href="#" @click.prevent="navigateTo('Rekapitulasi')">Rekapitulasi</a>
     </nav>
   </aside>
 </template>
