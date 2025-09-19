@@ -100,14 +100,17 @@ const currentMonthAndYear = computed(() => {
   return `${monthName} ${year}`;
 });
 
-const dailyTrendsChart = computed(() => {
+// --- [PASTE KODE BARU DI SINI] ---
+
+// 1. Data mentah untuk tren harian
+const dailyTrendsData = computed(() => {
   if (!monthlyData.value?.trainings || monthlyData.value.trainings.length === 0) return null;
 
- const now = new Date();
+  const now = new Date();
   const year = now.getFullYear();
   const month = now.getMonth();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
-  
+
   const dailyParticipantTotals = Array(daysInMonth).fill(0);
   const dailyHourTotals = Array(daysInMonth).fill(0);
 
@@ -122,82 +125,89 @@ const dailyTrendsChart = computed(() => {
 
   return {
     labels: Array.from({ length: daysInMonth }, (_, i) => i + 1),
-    datasets: [
-      // [FIX] DATASET PESERTA (PINK) KITA LETAKKAN DI ATAS
-      {
-        label: 'Total Peserta per Hari',
-        data: dailyParticipantTotals,
-        borderColor: '#ec4899',
-        yAxisID: 'yParticipants',
-        tension: 0.4,
-        fill: true,
-        backgroundColor: 'rgba(236, 72, 153, 0.2)',
-        pointRadius: 0,
-        pointHoverRadius: 6,
-        order: 2 
-      },
-      // [FIX] DATASET JAM TRAINING (UNGU) DI BAWAHNYA
-      {
-        label: 'Total Jam Training per Hari',
-        data: dailyHourTotals,
-        borderColor: '#a855f7',
-        yAxisID: 'yHours',
-        tension: 0.4,
-        fill: true,
-        backgroundColor: 'rgba(168, 85, 247, 0.2)',
-        pointRadius: 0,
-        pointHoverRadius: 6,
-        order: 1
-      }
-    ]
+    participants: dailyParticipantTotals,
+    hours: dailyHourTotals,
   };
 });
 
-const dailyTrendsChartOptions = ref({
+// 2. Data & Opsi untuk grafik PESERTA HARIAN
+const dailyParticipantsChart = computed(() => {
+  if (!dailyTrendsData.value) return null;
+  return {
+    labels: dailyTrendsData.value.labels,
+    datasets: [{
+      label: 'Total Peserta per Hari',
+      data: dailyTrendsData.value.participants,
+      borderColor: '#E62727',
+      borderWidth: 1,
+      tension: 0.4,
+      fill: true,
+      backgroundColor: (ctx) => {
+        const chart = ctx.chart
+        const { ctx: c, chartArea } = chart
+        if (!chartArea) return null // untuk mencegah error saat render awal
+
+        const gradient = c.createLinearGradient(0, chartArea.top, 0, chartArea.bottom)
+        gradient.addColorStop(0, 'rgba(239,68,68,0.6)') // merah pekat di atas
+        gradient.addColorStop(1, 'rgba(239,68,68,0.0)') // transparan ke bawah
+        return gradient
+      },
+      pointRadius: 0,
+      pointHoverRadius: 6,
+    }]
+  };
+});
+
+const dailyParticipantsOptions = ref({
   responsive: true,
   maintainAspectRatio: false,
-  interaction: {
-    mode: 'index',
-    intersect: false,
-  },
   plugins: {
-    legend: {
-      position: 'top',
-    },
-    title: {
-      display: true,
-      text: 'Aktivitas Harian Bulan Ini'
-    }
+    legend: { position: 'top' },
+    title: { display: true, text: 'Aktivitas Peserta Harian' }
   },
   scales: {
-    x: {
-      grid: { display: false },
-      ticks: { color: '#6b7280' }
-    },
-    // [FIX] Sumbu Y untuk Jam (MERAH) di KIRI
-    yHours: {
-      type: 'linear',
-      display: true,
-      position: 'left',
-      grid: {
-        color: '#f3f4f6'
+    y: { beginAtZero: true, ticks: { color: '#ec4899' } }
+  }
+});
+
+// 3. Data & Opsi untuk grafik JAM HARIAN
+const dailyHoursChart = computed(() => {
+  if (!dailyTrendsData.value) return null;
+  return {
+    labels: dailyTrendsData.value.labels,
+    datasets: [{
+      label: 'Total Jam Training per Hari',
+      data: dailyTrendsData.value.hours,
+      borderColor: '#3b82f6',
+      borderWidth: 1,
+      tension: 0.4,
+      fill: true,
+      backgroundColor: (ctx) => {
+        const chart = ctx.chart
+        const { ctx: c, chartArea } = chart
+        if (!chartArea) return null
+
+        // Gradient biru → transparan
+        const gradient = c.createLinearGradient(0, chartArea.top, 0, chartArea.bottom)
+        gradient.addColorStop(0, 'rgba(59,130,246,0.6)') // biru pekat di atas
+        gradient.addColorStop(1, 'rgba(59,130,246,0.0)') // transparan di bawah
+        return gradient
       },
-      ticks: {
-        color: '#ef4444' // Warna Merah
-      }
-    },
-    // [FIX] Sumbu Y untuk Peserta (UNGU) di KANAN
-    yParticipants: {
-      type: 'linear',
-      display: true,
-      position: 'right',
-      grid: {
-        drawOnChartArea: false,
-      },
-      ticks: {
-        color: '#a855f7' // Warna Ungu
-      }
-    }
+      pointRadius: 0,
+      pointHoverRadius: 6,
+    }]
+  };
+});
+
+const dailyHoursOptions = ref({
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: { position: 'top' },
+    title: { display: true, text: 'Aktivitas Jam Training Harian' }
+  },
+  scales: {
+    y: { beginAtZero: true, ticks: { color: '#a855f7' } }
   }
 });
 
@@ -270,9 +280,16 @@ const iconPencapaian = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" view
     </div>
   </div>
 <div class="section">
-    <div class="card">
-      <div class="chart-container-large">
-        <LineChart v-if="dailyTrendsChart" :chart-data="dailyTrendsChart" :chart-options="dailyTrendsChartOptions" />
+    <div class="daily-trends-grid">
+      <div class="card">
+        <div class="chart-container-large">
+          <LineChart v-if="dailyParticipantsChart" :chart-data="dailyParticipantsChart" :chart-options="dailyParticipantsOptions" />
+        </div>
+      </div>
+      <div class="card">
+        <div class="chart-container-large">
+          <LineChart v-if="dailyHoursChart" :chart-data="dailyHoursChart" :chart-options="dailyHoursOptions" />
+        </div>
       </div>
     </div>
   </div>
@@ -365,4 +382,9 @@ const iconPencapaian = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" view
   height: 450px; /* <-- UBAH NILAI INI */
 }
 
+.daily-trends-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 1.5rem;
+}
 </style>
