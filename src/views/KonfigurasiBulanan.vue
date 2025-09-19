@@ -1,9 +1,9 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, inject } from 'vue';
 import axios from 'axios';
 
 const apiUrl = import.meta.env.VITE_API_URL;
-
+const showNotification = inject('showNotification');
 // State untuk data utama
 const configBulanan = ref([]);
 const isLoading = ref(true);
@@ -17,10 +17,27 @@ const originalItem = ref(null); // Untuk melacak data asli saat edit
 const modalError = ref('');
 const isSubmitting = ref(false);
 
+const selectedYear = ref('');
+
+// Buat daftar tahun unik dari data yang ada untuk opsi dropdown
+const availableYears = computed(() => {
+  const years = configBulanan.value.map(item => item.tahun);
+  return [...new Set(years)].sort((a, b) => b - a); // Urutkan dari terbaru
+});
+
+// Ini adalah data yang akan ditampilkan di tabel, sudah terfilter
+const filteredData = computed(() => {
+  // JANGAN tampilkan apapun jika selectedYear kosong
+  if (!selectedYear.value) {
+    return []; 
+  }
+  return configBulanan.value.filter(item => item.tahun == selectedYear.value);
+});
+
 // Opsi untuk dropdown
 const years = computed(() => {
   const currentYear = new Date().getFullYear();
-  return [currentYear - 1, currentYear, currentYear + 1, currentYear + 2, currentYear + 3];
+  return [currentYear - 1, currentYear, currentYear + 1, currentYear + 2, currentYear + 3, currentYear + 4, currentYear + 5];
 });
 const months = ref(['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember']);
 
@@ -87,11 +104,12 @@ const handleSubmit = async () => {
     if (response.data.status === 'success') {
       await fetchData();
       closeModal();
+      showNotification(response.data.message, 'success');
     } else {
       throw new Error(response.data.message);
     }
   } catch (err) {
-    modalError.value = err.message || "Terjadi kesalahan saat menyimpan data.";
+    showNotification(err.message || "Terjadi kesalahan.", 'error');
   } finally {
     isSubmitting.value = false;
   }
@@ -105,11 +123,12 @@ const deleteItem = async (item) => {
 
       if (response.data.status === 'success') {
         await fetchData();
+        showNotification(response.data.message, 'success');
       } else {
         throw new Error(response.data.message);
       }
     } catch (err) {
-      alert("Gagal menghapus: " + err.message);
+      showNotification("Gagal menghapus: " + err.message, 'error');
     }
   }
 };
@@ -118,44 +137,63 @@ const deleteItem = async (item) => {
 <template>
   <div>
     <div class="card">
-       <div class="card-header">
+      <div class="card-header">
         <h2 class="card-title">Manajemen Konfigurasi Bulanan</h2>
         <button class="btn-add" @click="openModalForAdd">Tambah Periode</button>
       </div>
-      <div v-if="!isLoading && !error" class="table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                <th>Tahun</th>
-                <th>Bulan</th>
-                <th>Jumlah Karyawan</th>
-                <th>Target per Orang (Jam)</th>
-                <th>Aksi</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-if="configBulanan.length === 0">
-                <td colspan="5" class="empty-state">Tidak ada data.</td>
-              </tr>
-              <tr v-for="item in configBulanan" :key="`${item.tahun}-${item.bulan}`">
-                <td>{{ item.tahun }}</td>
-                <td>{{ item.bulan }}</td>
-                <td>{{ item.jumlahkaryawan }}</td>
-                <td>{{ item.targetperorang }}</td>
-                <td class="action-buttons">
-                  <button class="btn-edit" @click="openModalForEdit(item)">Edit</button>
-                  <button class="btn-delete" @click="deleteItem(item)">Hapus</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+
+      <div class="filter-container">
+        <label for="year-filter">Filter Berdasarkan Tahun:</label>
+        <select id="year-filter" v-model="selectedYear">
+          <option disabled value="">-- Pilih Tahun --</option>
+          <option v-for="year in availableYears" :key="year" :value="year">
+            {{ year }}
+          </option>
+        </select>
+      </div>
+
+      <div v-if="isLoading" class="loading-container">
+        <div class="spinner"></div>
+      </div>
+      
+      <div v-else-if="!selectedYear" class="empty-state">
+        <p>Silakan pilih tahun terlebih dahulu untuk menampilkan data.</p>
+      </div>
+
+      <div v-else class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Tahun</th>
+              <th>Bulan</th>
+              <th>Jumlah Karyawan</th>
+              <th>Target per Orang (Jam)</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-if="filteredData.length === 0">
+              <td colspan="5" class="empty-state">Tidak ada data konfigurasi untuk tahun {{ selectedYear }}.</td>
+            </tr>
+            <tr v-else v-for="item in filteredData" :key="`${item.tahun}-${item.bulan}`">
+              <td>{{ item.tahun }}</td>
+              <td>{{ item.bulan }}</td>
+              <td>{{ item.jumlahkaryawan }}</td>
+              <td>{{ item.targetperorang }}</td>
+              <td class="action-buttons">
+                <button class="btn-edit" @click="openModalForEdit(item)">Edit</button>
+                <button class="btn-delete" @click="deleteItem(item)">Hapus</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <div v-if="isModalOpen" class="modal-overlay" @click.self="closeModal">
       <div class="modal-content">
         <h3 class="modal-title">{{ modalMode === 'add' ? 'Tambah Periode Baru' : 'Edit Periode' }}</h3>
-        
+
         <form @submit.prevent="handleSubmit">
           <div class="form-grid">
             <div class="form-group">
@@ -220,4 +258,47 @@ const deleteItem = async (item) => {
 .btn-cancel { background-color: #e5e7eb; }
 .btn-save { background-color: var(--primary-color, #5356FF); color: white; }
 .feedback.error { background-color: #fee2e2; color: #991b1b; padding: 0.75rem; border-radius: 6px; margin-top: 1rem; text-align: center; }
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 4rem;
+}
+
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border-left-color: var(--primary-color, #5356FF);
+  animation: spin 1s ease infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+.filter-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background-color: #f9fafb;
+  border-radius: 6px;
+}
+
+.filter-container label {
+  font-weight: 500;
+}
+
+.filter-container select {
+  padding: 0.5rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
 </style>

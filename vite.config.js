@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 
-const API_TARGET_URL = "https://script.google.com/macros/s/AKfycbwS8EvngEcyymieaD7zFY6szGJEuwfRA0_JjMWGbZsLgY2ZYE9bar01H3ZV3SKZbl81/exec";
+const API_TARGET_URL = "https://script.google.com/macros/s/AKfycby-w5Ufnp2pwgDc3NwE9FX6iYk3jcpqN8Z8KWv-M5y9zS9WkFEJzrLu8pO7P1KcXoYd/exec";
 
 export default defineConfig({
   plugins: [vue()],

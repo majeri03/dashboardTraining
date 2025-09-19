@@ -1,0 +1,5 @@
+Laporan detail periode waktunya tidak dinamis daridatabase, crosschekc ulang semua langkahnya
+fitur pencarian konfigurasi dan perbaiki datanya terlalu banyak ditampilkan
+crosscheck fitur dinamis laininya
+form dropdown divisi google form
+export xcel and pdf

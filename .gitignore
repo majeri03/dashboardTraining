@@ -35,4 +35,4 @@ coverage
 
 # Vite config (root)
  /vite.config.js
-
+ src/firebase.config.js

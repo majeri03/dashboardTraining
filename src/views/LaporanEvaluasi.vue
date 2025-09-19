@@ -115,7 +115,7 @@ onMounted(() => {
 
 <template>
   <div class="card">
-    <h2 class="card-title">Data Laporan Evaluasi Peserta</h2>
+    <h2 class="card-title">Data Laporan Eksternal Training</h2>
     <div class="controls-container">
       <input type="text" v-model="searchQuery" placeholder="Cari data..." class="search-input">
       <button @click="forceRefresh" class="btn-refresh">Refresh Data 🔄</button>

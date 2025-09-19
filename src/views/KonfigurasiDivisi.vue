@@ -1,9 +1,9 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, inject } from 'vue';
 import axios from 'axios';
 
 const apiUrl = import.meta.env.VITE_API_URL;
-
+const showNotification = inject('showNotification');
 // State untuk data utama
 const configDivisi = ref([]);
 const isLoading = ref(true);
@@ -84,11 +84,12 @@ const handleSubmit = async () => {
     if (response.data.status === 'success') {
       await fetchData(); // Ambil data terbaru dari server
       closeModal();
+      showNotification(response.data.message, 'success');
     } else {
       throw new Error(response.data.message);
     }
   } catch (err) {
-    modalError.value = err.message || "Terjadi kesalahan saat menyimpan data.";
+    showNotification(err.message || "Terjadi kesalahan.", 'error');
   } finally {
     isSubmitting.value = false;
   }
@@ -102,11 +103,12 @@ const deleteItem = async (item) => {
 
       if (response.data.status === 'success') {
         await fetchData(); // Ambil data terbaru
+        showNotification(response.data.message, 'success');
       } else {
         throw new Error(response.data.message);
       }
     } catch (err) {
-      alert("Gagal menghapus: " + err.message);
+      showNotification("Gagal menghapus: " + err.message, 'error');
     }
   }
 };
@@ -118,6 +120,9 @@ const deleteItem = async (item) => {
       <div class="card-header">
         <h2 class="card-title">Manajemen Konfigurasi Divisi</h2>
         <button class="btn-add" @click="openModalForAdd">Tambah Divisi</button>
+      </div>
+      <div v-if="isLoading" class="loading-container">
+        <div class="spinner"></div>
       </div>
       <div v-if="!isLoading && !error" class="table-wrapper">
           <table>
@@ -223,5 +228,29 @@ const deleteItem = async (item) => {
     border-radius: 6px;
     margin-top: 1rem;
     text-align: center;
+}
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 4rem;
+}
+
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border-left-color: var(--primary-color, #5356FF);
+  animation: spin 1s ease infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 </style>

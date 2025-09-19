@@ -1,6 +1,9 @@
 <script setup>
 import { ref, onMounted, watch, computed } from 'vue';
 import axios from 'axios';
+import * as XLSX from 'xlsx';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -12,7 +15,7 @@ const now = new Date();
 const selectedMonth = ref(now.getMonth() + 1);
 const selectedYear = ref(now.getFullYear());
 const months = ref([...Array(12).keys()].map(i => ({ value: i + 1, name: new Date(0, i).toLocaleString('id-ID', { month: 'long' }) })));
-const years = ref([2024, 2025, 2026]);
+const years = ref([2024, 2025, 2026, 2027, 2028, 2029,2030]);
 
 const divisiHeaders = ref([]);
 
@@ -81,6 +84,216 @@ const getDivisiInfo = (rincian, div) => {
     if (!data) return "0 / 0";
     return `${data.peserta} / ${data.jam.toFixed(1)}`;
 };
+
+// Tambahkan dua fungsi baru ini di dalam <script setup>
+
+const exportToExcel = () => {
+  const dataToExport = [];
+  
+  // 1. Buat Header (Bagian ini sudah benar)
+  const mainHeader = ['No', 'Nama Kegiatan', 'Jadwal', 'Tipe', 'PIC/Pemateri', 'Jml Peserta', 'Durasi (Jam)', 'Total Jam Training'];
+  divisiHeaders.value.forEach(div => {
+    mainHeader.push(div, '');
+  });
+  mainHeader.push('Total Jam');
+  
+  const subHeader = ['', '', '', '', '', '', '', ''];
+  divisiHeaders.value.forEach(() => {
+    subHeader.push('P', 'J');
+  });
+  subHeader.push('');
+
+  dataToExport.push(mainHeader, subHeader);
+
+  // 2. Buat Body (Data Training)
+  // =======================================================
+  // AWAL LOOP DATA TRAINING
+  reportData.value.trainings.forEach((training, index) => {
+    const row = [
+      index + 1,
+      training.judul,
+      training.jadwal,
+      training.extInt,
+      training.pemateri,
+      training.jumlahPeserta,
+      training.durasi,
+      training.totalJamTraining.toFixed(1),
+    ];
+    divisiHeaders.value.forEach(div => {
+      const info = getDivisiInfo(training.rincianDivisi, div).split(' / ');
+      row.push(info[0], info[1]);
+    });
+    row.push(training.totalJamTraining.toFixed(1));
+    dataToExport.push(row);
+  });
+  // AKHIR LOOP DATA TRAINING
+  // =======================================================
+
+
+  // 3. --- BAGIAN SUMMARY (HANYA DIJALANKAN SEKALI SETELAH LOOP SELESAI) ---
+  if (reportData.value && reportData.value.trainings.length > 0) {
+    // Baris kosong sebagai pemisah
+    dataToExport.push([]); 
+
+    // Baris Total Bulanan
+    const totalRow = ['Total bulanan', '', '', '', '']; // 5 sel pertama
+    totalRow.push(
+        totalPesertaBulanan.value,
+        totalDurasiBulanan.value,
+        reportData.value.summary.totalJamBulanan.toFixed(1)
+    );
+    divisiHeaders.value.forEach(div => {
+        totalRow.push(
+            calculateColumnTotal(div, 'peserta'),
+            calculateColumnTotal(div, 'jam')
+        );
+    });
+    totalRow.push(reportData.value.summary.totalJamBulanan.toFixed(1));
+    dataToExport.push(totalRow);
+    
+    // Baris Summary Lainnya
+    const totalColumns = mainHeader.length;
+    const summaryColSpan = 7;
+    
+    const karyawanRow = ['Jumlah Karyawan'];
+    for(let i=0; i < summaryColSpan; i++) karyawanRow.push('');
+    karyawanRow[summaryColSpan] = reportData.value.summary.jumlahKaryawan;
+    dataToExport.push(karyawanRow);
+
+    const targetText = `Target (${reportData.value.summary.targetPerOrang} Jam) / Bulan`;
+    const targetRow = [targetText];
+    for(let i=0; i < summaryColSpan; i++) targetRow.push('');
+    targetRow[summaryColSpan] = reportData.value.summary.targetJamBulanan;
+    dataToExport.push(targetRow);
+
+    const acvRow = ['Acv (%)'];
+    for(let i=0; i < summaryColSpan; i++) acvRow.push('');
+    acvRow[summaryColSpan] = reportData.value.summary.pencapaian;
+    dataToExport.push(acvRow);
+  }
+  // --- AKHIR BAGIAN SUMMARY ---
+
+
+  // 4. Buat Workbook dan Worksheet
+  const ws = XLSX.utils.aoa_to_sheet(dataToExport);
+  
+  // Atur merge cells untuk header dan footer
+  ws['!merges'] = [];
+  let col = 8;
+  divisiHeaders.value.forEach(() => {
+    ws['!merges'].push({ s: { r: 0, c: col }, e: { r: 0, c: col + 1 } });
+    col += 2;
+  });
+
+  if (reportData.value && reportData.value.trainings.length > 0) {
+    const totalRowIndex = dataToExport.length - 4;
+    ws['!merges'].push({ s: { r: totalRowIndex, c: 0 }, e: { r: totalRowIndex, c: 4 } });
+    ws['!merges'].push({ s: { r: totalRowIndex + 1, c: 0 }, e: { r: totalRowIndex + 1, c: 6 } });
+    ws['!merges'].push({ s: { r: totalRowIndex + 2, c: 0 }, e: { r: totalRowIndex + 2, c: 6 } });
+    ws['!merges'].push({ s: { r: totalRowIndex + 3, c: 0 }, e: { r: totalRowIndex + 3, c: 6 } });
+  }
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Laporan Detail');
+
+  // 5. Trigger Download
+  XLSX.writeFile(wb, `Laporan_Detail_${selectedMonth.value}_${selectedYear.value}.xlsx`);
+};
+
+const exportToPDF = () => {
+  try {
+    const doc = new jsPDF({
+      orientation: 'landscape',
+      unit: 'mm',
+      format: 'a4'
+    });
+
+    const monthName = months.value.find(m => m.value === selectedMonth.value)?.name || 'Bulan';
+    doc.text(`Laporan Detail Bulanan - ${monthName} ${selectedYear.value}`, 14, 15);
+
+    // 1. Definisikan Header dengan hati-hati
+    const head = [];
+    const headerRow1 = [
+      { content: 'No', rowSpan: 2 }, { content: 'Nama Kegiatan', rowSpan: 2 },
+      { content: 'Jadwal', rowSpan: 2 }, { content: 'Tipe', rowSpan: 2 },
+      { content: 'PIC/Pemateri', rowSpan: 2 }, { content: 'Jml Peserta', rowSpan: 2 },
+      { content: 'Durasi (Jam)', rowSpan: 2 }, { content: 'Total Jam Training', rowSpan: 2 }
+    ];
+    divisiHeaders.value.forEach(div => {
+      headerRow1.push({ content: div, colSpan: 2, styles: { halign: 'center' } });
+    });
+    headerRow1.push({ content: 'Total Jam', rowSpan: 2 });
+
+    const headerRow2 = [];
+    divisiHeaders.value.forEach(() => {
+      headerRow2.push('P', 'J');
+    });
+    head.push(headerRow1, headerRow2);
+
+    // 2. Definisikan Body (Data Training)
+    const body = reportData.value.trainings.map((training, index) => {
+      const row = [
+        index + 1, training.judul, training.jadwal, training.extInt, training.pemateri,
+        training.jumlahPeserta, training.durasi, training.totalJamTraining.toFixed(1),
+      ];
+      divisiHeaders.value.forEach(div => {
+        const info = getDivisiInfo(training.rincianDivisi, div).split(' / ');
+        row.push(info[0] || '0', info[1] || '0');
+      });
+      row.push(training.totalJamTraining.toFixed(1));
+      return row;
+    });
+    
+    // 3. Definisikan Footer
+    const foot = [];
+    const footerRow1 = [{ content: 'Total bulanan', colSpan: 5, styles: { halign: 'right', fontStyle: 'bold' } }];
+    footerRow1.push(
+      { content: totalPesertaBulanan.value.toString(), styles: { fontStyle: 'bold' } },
+      { content: totalDurasiBulanan.value.toString(), styles: { fontStyle: 'bold' } },
+      { content: reportData.value.summary.totalJamBulanan.toFixed(1), styles: { fontStyle: 'bold' } }
+    );
+    divisiHeaders.value.forEach(div => {
+      footerRow1.push(
+        { content: calculateColumnTotal(div, 'peserta').toString(), styles: { fontStyle: 'bold' } },
+        { content: calculateColumnTotal(div, 'jam').toString(), styles: { fontStyle: 'bold' } }
+      );
+    });
+    footerRow1.push({ content: reportData.value.summary.totalJamBulanan.toFixed(1), styles: { fontStyle: 'bold' } });
+
+    const targetText = `Target (${reportData.value.summary.targetPerOrang} Jam) / Bulan`;
+    const footerRow2 = [{ content: 'Jumlah Karyawan', colSpan: 7, styles: { halign: 'right' } }, { content: reportData.value.summary.jumlahKaryawan.toString(), styles: { fontStyle: 'bold' } }];
+    const footerRow3 = [{ content: targetText, colSpan: 7, styles: { halign: 'right' } }, { content: reportData.value.summary.targetJamBulanan.toString(), styles: { fontStyle: 'bold' } }];
+    const footerRow4 = [{ content: 'Acv (%)', colSpan: 7, styles: { halign: 'right' } }, { content: reportData.value.summary.pencapaian.toString(), styles: { fontStyle: 'bold' } }];
+    foot.push(footerRow1, footerRow2, footerRow3, footerRow4);
+
+    // 4. Buat Tabel
+    autoTable(doc, {
+      head: head,
+      body: body,
+      foot: foot,
+      startY: 22,
+      theme: 'grid',
+      styles: { fontSize: 6, cellPadding: 1.5, halign: 'center' },
+      headStyles: { fillColor: [41, 128, 185], valign: 'middle', fontSize: 7 },
+      footStyles: { fillColor: [236, 240, 241], textColor: [44, 62, 80] },
+      didParseCell: function(data) {
+        // Atur agar kolom nama kegiatan rata kiri
+        if (data.column.index === 1 && data.section !== 'head') {
+          data.cell.styles.halign = 'left';
+        }
+      }
+    });
+
+    // 5. Trigger Download
+    doc.save(`Laporan_Detail_${selectedMonth.value}_${selectedYear.value}.pdf`);
+
+  } catch (err) {
+    console.error("Gagal membuat PDF:", err);
+    // Panggil notifikasi eror global yang sudah kita buat
+    showNotification("Gagal membuat PDF. Cek console untuk detail.", 'error');
+  }
+};
+
 </script>
 
 <template>
@@ -95,7 +308,14 @@ const getDivisiInfo = (rincian, div) => {
         <option v-for="year in years" :key="year" :value="year">{{ year }}</option>
       </select>
     </div>
-
+    <div class="export-controls">
+      <button @click="exportToExcel" :disabled="!reportData || reportData.trainings.length === 0">
+        Export ke Excel
+      </button>
+      <button @click="exportToPDF" :disabled="!reportData || reportData.trainings.length === 0">
+        Export ke PDF
+      </button>
+    </div>
     <div v-if="isLoading" class="loading-state">
       Memuat laporan...
     </div>
@@ -277,5 +497,24 @@ tfoot .empty-cell {
 .error-state {
   color: #d32f2f;
   font-weight: bold;
+}
+.export-controls {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  justify-content: flex-end; /* Posisikan tombol di kanan */
+}
+.export-controls button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  background-color: #10B981; /* Warna hijau */
+  color: white;
+}
+.export-controls button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
 }
 </style>

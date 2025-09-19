@@ -1,6 +1,11 @@
 <script setup>
-import { ref, shallowRef } from 'vue';
+import { ref, shallowRef, onMounted, provide } from 'vue';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { auth } from './firebase';
+import ForgotPassword from './views/ForgotPassword.vue';
+// Import semua komponen Anda
 import Sidebar from './components/Sidebar.vue';
+import Login from './views/Login.vue'; // <-- Import halaman Login
 import Dashboard from './views/Dashboard.vue';
 import LaporanPelaksanaan from './views/LaporanPelaksanaan.vue';
 import LaporanEvaluasi from './views/LaporanEvaluasi.vue';
@@ -8,6 +13,16 @@ import LaporanDetail from './views/LaporanDetail.vue';
 import InputAbsensi from './views/InputAbsensi.vue';
 import KonfigurasiDivisi from './views/KonfigurasiDivisi.vue';
 import KonfigurasiBulanan from './views/KonfigurasiBulanan.vue';
+import Notification from './components/Notification.vue';
+
+// State untuk melacak pengguna yang login
+const user = ref(null);
+const isAuthReady = ref(false); // Untuk mencegah flicker
+const authView = ref('login'); // 'login' atau 'forgotPassword'
+const authViews = {
+  login: Login,
+  forgotPassword: ForgotPassword
+};
 const views = {
   Dashboard,
   LaporanPelaksanaan,
@@ -19,7 +34,6 @@ const views = {
 };
 
 const isSidebarOpen = ref(false);
-
 const activeView = shallowRef(Dashboard);
 const activeViewName = ref('Dashboard');
 
@@ -32,22 +46,68 @@ const toggleSidebar = () => {
   isSidebarOpen.value = !isSidebarOpen.value;
 };
 
+// Fungsi Logout
+const logout = async () => {
+  await signOut(auth);
+};
+
+// Cek status login saat aplikasi dimuat
+onMounted(() => {
+  onAuthStateChanged(auth, (firebaseUser) => {
+    user.value = firebaseUser;
+    isAuthReady.value = true;
+  });
+});
+
+// Sediakan 'user' dan 'logout' untuk komponen anak (seperti Sidebar)
+provide('user', user);
+provide('logout', logout);
+
+// --- Logika Notifikasi (dari sebelumnya) ---
+const notification = ref({ message: '', type: '', visible: false });
+let notificationTimer = null;
+const showNotification = (message, type = 'success') => {
+  if (notificationTimer) clearTimeout(notificationTimer);
+  notification.value = { message, type, visible: true };
+  notificationTimer = setTimeout(() => {
+    notification.value.visible = false;
+  }, 3000);
+};
+provide('showNotification', showNotification);
 </script>
 
 <template>
-  <div id="app-layout" :class="{ 'sidebar-mobile-open': isSidebarOpen }">
-  <Sidebar @navigate="handleNavigation" :active-view="activeViewName" @close="toggleSidebar" />
-  <div v-if="isSidebarOpen" class="sidebar-overlay" @click="toggleSidebar"></div>
-  <main class="main-content">
-      <button class="hamburger-menu" @click="toggleSidebar">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:24px; height:24px;">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-        </svg>
-      </button>
-      <KeepAlive>
-        <component :is="activeView" />
-      </KeepAlive>
-    </main>
+  <Notification 
+    :message="notification.message" 
+    :type="notification.type" 
+    :visible="notification.visible" 
+  />
+
+  <div v-if="isAuthReady">
+    <div v-if="user" id="app-layout" :class="{ 'sidebar-mobile-open': isSidebarOpen }">
+      <Sidebar @navigate="handleNavigation" :active-view="activeViewName" @close="toggleSidebar" />
+      <div v-if="isSidebarOpen" class="sidebar-overlay" @click="toggleSidebar"></div>
+      <main class="main-content">
+        <button class="hamburger-menu" @click="toggleSidebar">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:24px; height:24px;">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+          </svg>
+        </button>
+        <KeepAlive>
+          <component :is="activeView" />
+        </KeepAlive>
+      </main>
+    </div>
+
+    <component 
+      v-else 
+      :is="authViews[authView]" 
+      @switch-view="newView => authView = newView"
+    />
+  </div>
+
+  <div v-else class="loading-screen">
+    <p>Loading...</p>
   </div>
 </template>
 
@@ -158,5 +218,11 @@ td a { color: var(--primary-color); text-decoration: none; font-weight: 500; }
     z-index: 99;
   }
 
+}
+.loading-screen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
 }
 </style>

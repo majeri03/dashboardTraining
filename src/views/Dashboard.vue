@@ -6,6 +6,8 @@ import KpiCard from '../components/KpiCard.vue';
 import DoughnutChart from '../components/DoughnutChart.vue';
 import LineChart from '../components/LineChart.vue';
 import SparklineChart from '../components/SparklineChart.vue'; // [BARU] Impor komponen sparkline
+import RadialProgress from '../components/RadialProgress.vue';
+import TimeReminder from '../components/TimeReminder.vue';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 const currentYear = new Date().getFullYear();
@@ -235,7 +237,29 @@ const fetchAllDashboardData = async () => {
   }
 };
 
-onMounted(fetchAllDashboardData);
+
+// --- TAMBAHKAN STATE BARU UNTUK METRIK KEPUASAN ---
+const satisfactionData = ref(null);
+const isSatisfactionLoading = ref(true);
+
+// --- BUAT FUNGSI BARU UNTUK MENGAMBIL DATA KEPUASAN ---
+const fetchSatisfactionData = async () => {
+  isSatisfactionLoading.value = true;
+  try {
+    const response = await axios.get(`${apiUrl}?action=getSatisfaction`);
+    satisfactionData.value = response.data;
+  } catch (err) {
+    console.error("Gagal memuat metrik kepuasan:", err);
+    satisfactionData.value = null; // Gagal memuat, jangan tampilkan apa-apa
+  } finally {
+    isSatisfactionLoading.value = false;
+  }
+};
+
+onMounted(() => {
+  fetchAllDashboardData(); // Fungsi lama Anda, tetap berjalan seperti biasa
+  fetchSatisfactionData(); // Panggil fungsi baru ini secara terpisah
+});
 
 const iconPeserta = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m-7.5-2.962A3.375 3.375 0 0 1 12 15.75c1.242 0 2.37-.626 3-1.58M12 9.75a3.375 3.375 0 0 1-3.375 3.375A3.375 3.375 0 0 1 5.25 9.75c0-1.856 1.504-3.375 3.375-3.375S12 7.894 12 9.75ZM6.375 12a.75.75 0 0 1 .75-.75h.008a.75.75 0 0 1 .75.75v.008a.75.75 0 0 1-.75.75h-.008a.75.75 0 0 1-.75-.75v-.008Zm4.5 0a.75.75 0 0 1 .75-.75h.008a.75.75 0 0 1 .75.75v.008a.75.75 0 0 1-.75.75h-.008a.75.75 0 0 1-.75-.75v-.008Zm4.5 0a.75.75 0 0 1 .75-.75h.008a.75.75 0 0 1 .75.75v.008a.75.75 0 0 1-.75.75h-.008a.75.75 0 0 1-.75-.75v-.008Z" /></svg>`;
 const iconJam = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>`;
@@ -245,8 +269,25 @@ const iconPencapaian = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" view
 <template>
   <div>
     <div class="header">
-      <h1 class="header-title">Dashboard Training</h1>
-      <p class="header-subtitle">Ringkasan Aktivitas Training</p>
+      <div class="header-title-group">
+        <h1 class="header-title">Manajemen Training</h1>
+        <p class="header-subtitle">Ringkasan Aktivitas Training</p>
+      </div>
+
+      <div class="header-metrics-group">
+        <TimeReminder />
+
+        <div v-if="isSatisfactionLoading" class="loading-small">Memuat metrik...</div>
+        <div v-if="!isSatisfactionLoading && satisfactionData" class="satisfaction-grid">
+          <RadialProgress :percentage="satisfactionData.pemateri" label="Pemateri" />
+          <RadialProgress :percentage="satisfactionData.materi" label="Materi" />
+          <RadialProgress :percentage="satisfactionData.waktu" label="Waktu" />
+          <RadialProgress :percentage="satisfactionData.fasilitas" label="Fasilitas" />
+          <RadialProgress :percentage="satisfactionData.perlengkapan" label="Perlengkapan" />
+          <RadialProgress :percentage="satisfactionData.manfaat" label="Manfaat" />
+          <RadialProgress :percentage="satisfactionData.konsumsi" label="Konsumsi" />
+        </div>
+      </div>
     </div>
 
     <div v-if="isLoading">Memuat data...</div>
@@ -386,5 +427,56 @@ const iconPencapaian = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" view
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
   gap: 1.5rem;
+}
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start; /* Ubah ke flex-start agar tidak meregang */
+  gap: 2rem;
+  flex-wrap: wrap; /* Izinkan wrap di layar kecil */
+}
+
+.header-metrics-group {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  
+  /* PENTING: Mencegah grup ini meregang melebihi lebar layar */
+  min-width: 0; 
+}
+
+.satisfaction-grid {
+  display: flex;
+  gap: 1rem;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background-color: #fff;
+}
+
+@media (max-width: 900px) {
+  .header-metrics-group {
+    /* Di layar kecil, biarkan grup ini memenuhi lebar yang tersedia */
+    flex-grow: 1;
+  }
+  
+  .satisfaction-grid {
+    overflow-x: auto; /* Izinkan scroll horizontal */
+    flex-wrap: nowrap; /* Pastikan item tidak turun ke bawah */
+    flex-grow: 1; /* Biarkan dia meregang memenuhi .header-metrics-group */
+    
+    /* Sembunyikan scrollbar agar rapi */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .satisfaction-grid::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.loading-small {
+  font-size: 0.9em;
+  color: #6b7280;
 }
 </style>
