@@ -8,7 +8,7 @@ import LineChart from '../components/LineChart.vue';
 import SparklineChart from '../components/SparklineChart.vue'; // [BARU] Impor komponen sparkline
 
 const apiUrl = import.meta.env.VITE_API_URL;
-
+const currentYear = new Date().getFullYear();
 // State untuk data
 const monthlyData = ref(null);
 const yearlyTrendData = ref(null);
@@ -93,6 +93,113 @@ const hoursTrendChart = computed(() => {
   }
 });
 
+const currentMonthAndYear = computed(() => {
+  const now = new Date();
+  const monthName = months.value[now.getMonth()].name;
+  const year = now.getFullYear();
+  return `${monthName} ${year}`;
+});
+
+const dailyTrendsChart = computed(() => {
+  if (!monthlyData.value?.trainings || monthlyData.value.trainings.length === 0) return null;
+
+ const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  
+  const dailyParticipantTotals = Array(daysInMonth).fill(0);
+  const dailyHourTotals = Array(daysInMonth).fill(0);
+
+  monthlyData.value.trainings.forEach(training => {
+    const dateParts = training.jadwal.split(' ');
+    const day = parseInt(dateParts[0]);
+    if (!isNaN(day) && day > 0 && day <= daysInMonth) {
+      dailyParticipantTotals[day - 1] += training.jumlahPeserta;
+      dailyHourTotals[day - 1] += training.totalJamTraining;
+    }
+  });
+
+  return {
+    labels: Array.from({ length: daysInMonth }, (_, i) => i + 1),
+    datasets: [
+      // [FIX] DATASET PESERTA (PINK) KITA LETAKKAN DI ATAS
+      {
+        label: 'Total Peserta per Hari',
+        data: dailyParticipantTotals,
+        borderColor: '#ec4899',
+        yAxisID: 'yParticipants',
+        tension: 0.4,
+        fill: true,
+        backgroundColor: 'rgba(236, 72, 153, 0.2)',
+        pointRadius: 0,
+        pointHoverRadius: 6,
+        order: 2 
+      },
+      // [FIX] DATASET JAM TRAINING (UNGU) DI BAWAHNYA
+      {
+        label: 'Total Jam Training per Hari',
+        data: dailyHourTotals,
+        borderColor: '#a855f7',
+        yAxisID: 'yHours',
+        tension: 0.4,
+        fill: true,
+        backgroundColor: 'rgba(168, 85, 247, 0.2)',
+        pointRadius: 0,
+        pointHoverRadius: 6,
+        order: 1
+      }
+    ]
+  };
+});
+
+const dailyTrendsChartOptions = ref({
+  responsive: true,
+  maintainAspectRatio: false,
+  interaction: {
+    mode: 'index',
+    intersect: false,
+  },
+  plugins: {
+    legend: {
+      position: 'top',
+    },
+    title: {
+      display: true,
+      text: 'Aktivitas Harian Bulan Ini'
+    }
+  },
+  scales: {
+    x: {
+      grid: { display: false },
+      ticks: { color: '#6b7280' }
+    },
+    // [FIX] Sumbu Y untuk Jam (MERAH) di KIRI
+    yHours: {
+      type: 'linear',
+      display: true,
+      position: 'left',
+      grid: {
+        color: '#f3f4f6'
+      },
+      ticks: {
+        color: '#ef4444' // Warna Merah
+      }
+    },
+    // [FIX] Sumbu Y untuk Peserta (UNGU) di KANAN
+    yParticipants: {
+      type: 'linear',
+      display: true,
+      position: 'right',
+      grid: {
+        drawOnChartArea: false,
+      },
+      ticks: {
+        color: '#a855f7' // Warna Ungu
+      }
+    }
+  }
+});
 
 const fetchAllDashboardData = async () => {
   isLoading.value = true;
@@ -137,53 +244,62 @@ const iconPencapaian = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" view
 
     <div v-else-if="monthlyData && yearlyTrendData">
       
-      <div v-if="kpiMetrics" class="kpi-grid">
-        <KpiCard :title="'Total Peserta (' + months[new Date().getMonth()].name + ')'" :value="kpiMetrics.totalPeserta" :icon="iconPeserta" color="#5356FF" />
+  <div class="section">
+    <h2 class="section-title">Analisis Bulan Ini ({{ currentMonthAndYear }})</h2>
+    <div class="dashboard-grid">
+
+      <div class="kpi-container">
+        <KpiCard :title="'Total Peserta'" :value="kpiMetrics.totalPeserta" :icon="iconPeserta" color="#5356FF" />
         <KpiCard title="Total Jam Training" :value="kpiMetrics.totalJam" unit="Jam" :icon="iconJam" color="#378CE7" />
         <KpiCard title="Pencapaian Target" :value="kpiMetrics.pencapaian" :icon="iconPencapaian" color="#10B981" />
       </div>
 
-      <div class="section">
-        <h2 class="section-title">Insight & Tren Tahunan</h2>
-        <div class="insight-grid">
-          <div class="insight-card">
-            <div class="insight-header">
-              <span class="insight-title">Tren Peserta Tahun Ini</span>
-              <span class="insight-total red">{{ yearlyTrendData.monthlyParticipants.reduce((a, b) => a + b, 0) }} Total</span>
-            </div>
-            <div class="sparkline-container">
-              <SparklineChart v-if="participantTrendChart" :chart-data="participantTrendChart" color="#EF4444" />
-            </div>
-          </div>
-          <div class="insight-card">
-            <div class="insight-header">
-              <span class="insight-title">Tren Jam Training Tahun Ini</span>
-              <span class="insight-total blue">{{ yearlyTrendData.monthlyHours.reduce((a, b) => a + b, 0).toFixed(1) }} Jam</span>
-            </div>
-            <div class="sparkline-container">
-              <SparklineChart v-if="hoursTrendChart" :chart-data="hoursTrendChart" color="#3B82F6" />
-            </div>
-          </div>
+      <div class="card">
+        <h3 class="card-title">Peserta per Divisi</h3>
+        <div class="chart-container">
+          <BarChart v-if="pesertaPerDivisiChart" :chart-data="pesertaPerDivisiChart" />
         </div>
       </div>
 
-      <div class="section">
-        <h2 class="section-title">Analisis Bulan Ini</h2>
-        <div class="dashboard-grid">
-          <div class="card">
-            <h3 class="card-title">Peserta per Divisi</h3>
-            <div class="chart-container">
-              <BarChart v-if="pesertaPerDivisiChart" :chart-data="pesertaPerDivisiChart" />
-            </div>
-          </div>
-          <div class="card">
-            <h3 class="card-title">Tipe Training</h3>
-            <div class="chart-container">
-              <DoughnutChart v-if="intExtChart" :chart-data="intExtChart" />
-            </div>
-          </div>
+      <div class="card">
+        <h3 class="card-title">Tipe Training</h3>
+        <div class="chart-container">
+          <DoughnutChart v-if="intExtChart" :chart-data="intExtChart" />
         </div>
       </div>
+    </div>
+  </div>
+<div class="section">
+    <div class="card">
+      <div class="chart-container-large">
+        <LineChart v-if="dailyTrendsChart" :chart-data="dailyTrendsChart" :chart-options="dailyTrendsChartOptions" />
+      </div>
+    </div>
+  </div>
+<div class="section">
+  <h2 class="section-title">Insight & Tren Tahunan {{ currentYear }}</h2>
+  <div class="insight-grid">
+    <div class="insight-card">
+      <div class="insight-header">
+        <span class="insight-title">Tren Peserta Tahun Ini</span>
+        <span class="insight-total red">{{ yearlyTrendData.monthlyParticipants.reduce((a, b) => a + b, 0) }} Total</span>
+      </div>
+      <div class="sparkline-container">
+        <SparklineChart v-if="participantTrendChart" :chart-data="participantTrendChart" color="#EF4444" />
+      </div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-header">
+        <span class="insight-title">Tren Jam Training Tahun Ini</span>
+        <span class="insight-total blue">{{ yearlyTrendData.monthlyHours.reduce((a, b) => a + b, 0).toFixed(1) }} Jam</span>
+      </div>
+      <div class="sparkline-container">
+        <SparklineChart v-if="hoursTrendChart" :chart-data="hoursTrendChart" color="#3B82F6" />
+      </div>
+    </div>
+  </div>
+</div>
+
 
     </div>
   </div>
@@ -235,4 +351,18 @@ const iconPencapaian = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" view
 .sparkline-container {
   height: 80px;
 }
+
+.kpi-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.chart-container-large {
+  position: relative;
+  height: 450px; /* <-- UBAH NILAI INI */
+}
+
 </style>
