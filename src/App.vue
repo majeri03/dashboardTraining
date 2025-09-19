@@ -6,13 +6,16 @@ import LaporanPelaksanaan from './views/LaporanPelaksanaan.vue';
 import LaporanEvaluasi from './views/LaporanEvaluasi.vue';
 import LaporanDetail from './views/LaporanDetail.vue';
 import InputAbsensi from './views/InputAbsensi.vue';
-
+import KonfigurasiDivisi from './views/KonfigurasiDivisi.vue';
+import KonfigurasiBulanan from './views/KonfigurasiBulanan.vue';
 const views = {
   Dashboard,
   LaporanPelaksanaan,
   LaporanEvaluasi,
   LaporanDetail,
   InputAbsensi,
+  KonfigurasiDivisi,
+  KonfigurasiBulanan,
 };
 
 const isSidebarOpen = ref(false);

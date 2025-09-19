@@ -43,7 +43,7 @@ const pesertaPerDivisiChart = computed(() => {
     labels: Object.keys(rekap),
     datasets: [{
       label: 'Jumlah Peserta',
-      backgroundColor: '#5356FF',
+      backgroundColor: '#722323',
       data: Object.values(rekap),
       borderRadius: 4,
     }],
@@ -57,7 +57,7 @@ const intExtChart = computed(() => {
   return {
     labels: ['Internal', 'Eksternal'],
     datasets: [{
-      backgroundColor: ['#5356FF', '#378CE7'],
+      backgroundColor: ['#3E0703', '#8C1007'],
       data: [int, ext],
       borderWidth: 2,
       borderColor: '#DFF5FF'
@@ -259,9 +259,9 @@ const iconPencapaian = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" view
     <div class="dashboard-grid">
 
       <div class="kpi-container">
-        <KpiCard :title="'Total Peserta'" :value="kpiMetrics.totalPeserta" :icon="iconPeserta" color="#5356FF" />
-        <KpiCard title="Total Jam Training" :value="kpiMetrics.totalJam" unit="Jam" :icon="iconJam" color="#378CE7" />
-        <KpiCard title="Pencapaian Target" :value="kpiMetrics.pencapaian" :icon="iconPencapaian" color="#10B981" />
+        <KpiCard :title="'Total Peserta'" :value="kpiMetrics.totalPeserta" :icon="iconPeserta" color="#8C1007" />
+        <KpiCard title="Total Jam Training" :value="kpiMetrics.totalJam" unit="Jam" :icon="iconJam" color="#8C1007" />
+        <KpiCard title="Pencapaian Target" :value="kpiMetrics.pencapaian" :icon="iconPencapaian" color="#8C1007" />
       </div>
 
       <div class="card">

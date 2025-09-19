@@ -75,25 +75,32 @@ const submitForm = async () => {
   error.value = null;
   successMessage.value = '';
 
+  // 1. Data absensi yang akan dikirim (ini sudah benar)
   const submissionData = {
     judulTraining: selectedTraining.value
   };
   
   divisions.value.forEach(div => {
-    const headerAsli = "Jumlah Peserta Divisi " + div;
-    const key = toCamelCase(headerAsli);
+    const key = toCamelCase("Jumlah Peserta Divisi " + div);
     submissionData[key] = participantCounts.value[div] || 0;
   });
 
+  // 2. [INI PERBAIKANNYA] Kita bungkus data tersebut ke dalam format baru
+  const finalPayload = {
+    action: 'addAbsensi', // Beri tahu backend tugasnya adalah 'addAbsensi'
+    payload: submissionData  // Kirim data absensi di dalam 'payload'
+  };
+
   try {
-    const response = await axios.post(apiUrl, submissionData, {
+    // 3. Kirim 'finalPayload' yang sudah lengkap
+    const response = await axios.post(apiUrl, finalPayload, {
       headers: { 'Content-Type': 'application/json' }
     });
+
     if (response.data.status === 'success') {
       successMessage.value = response.data.message;
       selectedTraining.value = '';
       divisions.value.forEach(div => { participantCounts.value[div] = 0; });
-      // Setelah berhasil submit, perbarui daftar judul yang sudah direkam
       await fetchRecordedTitles();
     } else {
       throw new Error(response.data.message);

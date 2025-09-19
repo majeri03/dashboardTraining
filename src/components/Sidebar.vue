@@ -1,10 +1,11 @@
 <script setup>
-// [BARU] Menerima 'prop' dari App.vue untuk mengetahui view yang aktif
+import { ref } from 'vue';
 defineProps({
   activeView: String
 });
 
 const emit = defineEmits(['navigate', 'close']);
+const isKonfigurasiOpen = ref(false);
 
 const navigateTo = (view) => {
   emit('navigate', view);
@@ -61,6 +62,26 @@ const menuItems = [
         <span class="nav-icon" v-html="item.icon"></span>
         <span class="nav-text">{{ item.label || item.name }}</span>
       </a>
+      <div class="nav-dropdown">
+        <a href="#" class="nav-link" @click.prevent="isKonfigurasiOpen = !isKonfigurasiOpen">
+          <span class="nav-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-1.007 1.11-1.007h2.593c.55 0 1.02.465 1.11 1.007l.073.438c.11.662.596 1.186 1.246 1.348l.418.106c.47.118.946.368 1.355.768l.317.317c.474.474.722 1.11.634 1.742l-.087.632c-.097.702-.45 1.34-.985 1.782l-.27.27c-.41.41-.85.74-1.326.953l-.42.213c-.696.353-1.15.99-1.21 1.742l-.04.463c-.09.542-.56 1.007-1.11 1.007H10.7c-.55 0-1.02-.465-1.11-1.007l-.04-.463c-.06-.752-.514-1.39-1.21-1.742l-.42-.213c-.476-.213-.916-.543-1.326-.953l-.27-.27c-.535-.442-.888-1.08-.985-1.782l-.087-.632c-.088-.632.16-1.268.634-1.742l.317-.317c.41-.4.885-.65 1.355-.768l.418-.106c.65-.163 1.136-.686 1.246-1.348l.073-.438zM12 15.75a3.75 3.75 0 100-7.5 3.75 3.75 0 000 7.5z" /></svg>
+          </span>
+          <span class="nav-text">Konfigurasi</span>
+          <span class="dropdown-arrow" :class="{ 'is-open': isKonfigurasiOpen }">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" style="width:20px; height:20px;"><path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 011.06 0L10 11.94l3.72-3.72a.75.75 0 111.06 1.06l-4.25 4.25a.75.75 0 01-1.06 0L5.22 9.28a.75.75 0 010-1.06z" clip-rule="evenodd" /></svg>
+          </span>
+        </a>
+
+        <div class="submenu" v-if="isKonfigurasiOpen">
+          <a href="#" class="submenu-link" :class="{ 'submenu-link-active': activeView === 'KonfigurasiDivisi' }" @click.prevent="navigateTo('KonfigurasiDivisi')">
+            Konfigurasi Divisi
+          </a>
+          <a href="#" class="submenu-link" :class="{ 'submenu-link-active': activeView === 'KonfigurasiBulanan' }" @click.prevent="navigateTo('KonfigurasiBulanan')">
+            Konfigurasi Bulanan
+          </a>
+        </div>
+      </div>
     </nav>
   </aside>
 </template>
@@ -162,8 +183,48 @@ const menuItems = [
 
 @media (max-width: 768px) {
   .close-menu {
-    display: block; /* Tampil di mobile */
+    display: block; 
   }
+}
+
+.nav-link {
+  position: relative; /* Diperlukan agar panah dropdown pas posisinya */
+}
+
+.dropdown-arrow {
+  position: absolute;
+  right: 1rem;
+  transition: transform 0.2s; /* Animasi putar */
+}
+
+.dropdown-arrow.is-open {
+  transform: rotate(180deg); /* Putar 180 derajat saat terbuka */
+}
+
+.submenu {
+  display: flex;
+  flex-direction: column;
+  padding-left: 3.25rem; /* Beri jarak kiri agar menjorok ke dalam */
+  border-radius: 6px;
+  margin-top: 0.25rem;
+}
+
+.submenu-link {
+  color: var(--sidebar-text, #ffffff);
+  text-decoration: none;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9em; /* Sedikit lebih kecil dari menu utama */
+}
+
+.submenu-link:hover {
+  background-color: var(--sidebar-active-bg, #374151);
+}
+
+.submenu-link-active {
+  color: #FFFFFF;
+  font-weight: 600;
+  background-color: var(--primary-color, #3B82F6);
 }
 
 </style>
