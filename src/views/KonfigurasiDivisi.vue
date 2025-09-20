@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted, inject } from 'vue';
+import apiClient from '../api';
 import axios from 'axios';
 
 const apiUrl = import.meta.env.VITE_API_URL;
@@ -72,13 +73,13 @@ const handleSubmit = async () => {
     let response;
     if (modalMode.value === 'add') {
       const payload = { action: 'addDivisi', payload: currentItem.value };
-      response = await axios.post(apiUrl, payload);
+      response = await apiClient.post('', payload);
     } else {
       const payload = { 
         action: 'updateDivisi', 
         payload: { ...currentItem.value, originalDivisi: originalDivisiName.value }
       };
-      response = await axios.post(apiUrl, payload);
+      response = await apiClient.post('', payload);
     }
 
     if (response.data.status === 'success') {
@@ -99,7 +100,7 @@ const deleteItem = async (item) => {
   if (confirm(`Apakah Anda yakin ingin menghapus divisi "${item.divisi}"?`)) {
     try {
       const payload = { action: 'deleteDivisi', payload: { divisi: item.divisi } };
-      const response = await axios.post(apiUrl, payload);
+      const response = await apiClient.post('', payload);
 
       if (response.data.status === 'success') {
         await fetchData(); // Ambil data terbaru
