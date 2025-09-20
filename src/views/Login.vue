@@ -36,155 +36,156 @@ const login = async () => {
     <div class="left-panel">
       <div class="welcome-content">
         <img src="/images/logo.png" alt="Bosowa Logo" class="logo">
-        <h1>Selamat Datang di<br>Training Center</h1>
+        
+        <h1>Dashboard Training Center</h1>
         <p>Silakan masuk untuk mengelola dan memantau semua data aktivitas training Anda.</p>
         
-        <svg class="illustration" viewBox="0 0 577 493" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M428.24 358.332C428.24 358.332 460.33 325.222 467.33 301.222C474.33 277.222 460.33 259.222 453.33 249.222C446.33 239.222 431.24 233.222 431.24 233.222L416.24 163.222L360.24 18.2222L329.24 1.22217L213.24 1.22217L181.24 18.2222L125.24 163.222L110.24 233.222C110.24 233.222 95.1499 239.222 88.1499 249.222C81.1499 259.222 67.1499 277.222 74.1499 301.222C81.1499 325.222 113.24 358.222 113.24 358.222" fill="#E2E8F0" stroke="#475569" stroke-width="2"/>
-            <rect x="135" y="157" width="298" height="191" rx="12" fill="white" stroke="#475569" stroke-width="2"/>
-            <rect x="156" y="235" width="128" height="9" rx="4.5" fill="#CBD5E1"/>
-            <rect x="156" y="259" width="256" height="9" rx="4.5" fill="#F1F5F9"/>
-            <rect x="156" y="278" width="256" height="9" rx="4.5" fill="#F1F5F9"/>
-            <rect x="156" y="297" width="198" height="9" rx="4.5" fill="#F1F5F9"/>
-            <path d="M482.5 491.5C529.93 491.5 568 453.43 568 406C568 358.57 529.93 320.5 482.5 320.5C435.07 320.5 397 358.57 397 406C397 453.43 435.07 491.5 482.5 491.5Z" fill="#F59E0B"/>
-            <path d="M499 406.001C499 415.389 491.389 423 482 423C472.611 423 465 415.389 465 406.001C465 396.612 472.611 389 482 389C491.389 389 499 396.612 499 406.001Z" fill="#FBBF24"/>
-            <rect x="290" y="196" width="88" height="4" rx="2" fill="#E2E8F0"/>
-            <rect x="156" y="196" width="114" height="12" rx="6" fill="#475569"/>
-            <circle cx="399" cy="198" r="7" fill="#F87171"/>
-            <circle cx="419" cy="198" r="7" fill="#4ADE80"/>
-        </svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 48 48"><path fill="#000000" fill-rule="evenodd" d="M6 6h31v5h-2V8H8v23h21.387v2H6V6Zm30 13a3 3 0 1 0 0-6a3 3 0 0 0 0 6Zm2.031 2.01c1.299 0 2.327.584 3 1.486c.629.845.895 1.89.955 2.855a7.626 7.626 0 0 1-.397 2.92c-.3.87-.807 1.77-1.589 2.387V40.5a1.5 1.5 0 0 1-2.98.247L35.73 33h-.298l-1.458 7.776A1.5 1.5 0 0 1 31 40.5V26.233a63.223 63.223 0 0 0-.592.919l-.078.123l-.02.032l-.005.009a1.5 1.5 0 0 1-1.274.707h-5a1.5 1.5 0 1 1 0-3h4.177c.243-.376.563-.864.899-1.354c.35-.511.736-1.052 1.08-1.476c.167-.207.354-.423.542-.6c.092-.087.22-.2.376-.3a1.72 1.72 0 0 1 .926-.282h6Z" clip-rule="evenodd"/></svg>
       </div>
     </div>
 
     <div class="right-panel">
-      <div class="login-box">
-        <h2>Sign In</h2>
-        <p class="subtitle">Selamat datang kembali! Silakan masuk.</p>
-        <form @submit.prevent="login">
-          <div class="input-group">
-            <label for="email">Email</label>
-            <input type="email" id="email" v-model="email" required placeholder="Enter your email">
-          </div>
-          <div class="input-group">
-            <label for="password">Password</label>
-            <input type="password" id="password" v-model="password" required placeholder="Enter your password">
-          </div>
-          
-          <div class="form-footer">
-            <a href="#" @click.prevent="emit('switch-view', 'forgotPassword')" class="link">
-            Lupa Password?
-            </a>
-          </div>
-
-          <p v-if="error" class="error-message">{{ error }}</p>
-          <button type="submit" :disabled="isLoading">
-            {{ isLoading ? 'Loading...' : 'Sign In' }}
-          </button>
-        </form>
-      </div>
+  <div class="login-box">
+    <div class="mobile-header">
+      <img src="/images/logo.png" alt="Bosowa Logo" class="logo-mobile">
+      <h2 class="mobile-title">Training Center</h2>
     </div>
+
+    <h2 class="form-title">Sign In</h2>
+    <form @submit.prevent="login">
+      <div class="input-group">
+
+<svg class="input-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M4 9.00005L10.2 13.65C11.2667 14.45 12.7333 14.45 13.8 13.65L20 9" stroke="#ada9a9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M3 9.17681C3 8.45047 3.39378 7.78123 4.02871 7.42849L11.0287 3.5396C11.6328 3.20402 12.3672 3.20402 12.9713 3.5396L19.9713 7.42849C20.6062 7.78123 21 8.45047 21 9.17681V17C21 18.1046 20.1046 19 19 19H5C3.89543 19 3 18.1046 3 17V9.17681Z" stroke="#ada9a9" stroke-width="2" stroke-linecap="round"></path> </g></svg>
+
+<input type="email" id="email" v-model="email" required placeholder="Enter your email address">
+
+</div>
+
+
+<div class="input-group">
+
+ <svg class="input-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M12.7502 10C12.7502 9.58579 12.4144 9.25 12.0002 9.25C11.586 9.25 11.2502 9.58579 11.2502 10V10.7012L10.6428 10.3505C10.2841 10.1434 9.8254 10.2663 9.61829 10.625C9.41119 10.9837 9.53409 11.4424 9.89281 11.6495L10.4997 11.9999L9.89258 12.3505C9.53386 12.5576 9.41095 13.0163 9.61806 13.375C9.82517 13.7337 10.2839 13.8566 10.6426 13.6495L11.2502 13.2987V14C11.2502 14.4142 11.586 14.75 12.0002 14.75C12.4144 14.75 12.7502 14.4142 12.7502 14V13.2993L13.3569 13.6495C13.7156 13.8566 14.1743 13.7337 14.3814 13.375C14.5885 13.0163 14.4656 12.5576 14.1069 12.3505L13.4997 11.9999L14.1067 11.6495C14.4654 11.4424 14.5883 10.9837 14.3812 10.625C14.1741 10.2663 13.7154 10.1434 13.3567 10.3505L12.7502 10.7006V10Z" fill="#ada9a9"></path> <path d="M6.73266 9.25C7.14687 9.25 7.48266 9.58579 7.48266 10V10.7006L8.0891 10.3505C8.44782 10.1434 8.90652 10.2663 9.11362 10.625C9.32073 10.9837 9.19782 11.4424 8.8391 11.6495L8.23217 11.9999L8.83934 12.3505C9.19806 12.5576 9.32096 13.0163 9.11386 13.375C8.90675 13.7337 8.44806 13.8566 8.08934 13.6495L7.48266 13.2993V14C7.48266 14.4142 7.14687 14.75 6.73266 14.75C6.31844 14.75 5.98266 14.4142 5.98266 14V13.2987L5.375 13.6495C5.01628 13.8566 4.55759 13.7337 4.35048 13.375C4.14338 13.0163 4.26628 12.5576 4.625 12.3505L5.23217 11.9999L4.62524 11.6495C4.26652 11.4424 4.14361 10.9837 4.35072 10.625C4.55782 10.2663 5.01652 10.1434 5.37524 10.3505L5.98266 10.7012V10C5.98266 9.58579 6.31844 9.25 6.73266 9.25Z" fill="#ada9a9"></path> <path d="M18.0181 10C18.0181 9.58579 17.6823 9.25 17.2681 9.25C16.8539 9.25 16.5181 9.58579 16.5181 10V10.7012L15.9106 10.3505C15.5519 10.1434 15.0932 10.2663 14.8861 10.625C14.679 10.9837 14.8019 11.4424 15.1606 11.6495L15.7676 11.9999L15.1604 12.3505C14.8017 12.5576 14.6788 13.0163 14.8859 13.375C15.093 13.7337 15.5517 13.8566 15.9104 13.6495L16.5181 13.2987V14C16.5181 14.4142 16.8539 14.75 17.2681 14.75C17.6823 14.75 18.0181 14.4142 18.0181 14V13.2993L18.6247 13.6495C18.9835 13.8566 19.4422 13.7337 19.6493 13.375C19.8564 13.0163 19.7335 12.5576 19.3747 12.3505L18.7676 11.9999L19.3745 11.6495C19.7332 11.4424 19.8561 10.9837 19.649 10.625C19.4419 10.2663 18.9832 10.1434 18.6245 10.3505L18.0181 10.7006V10Z" fill="#ada9a9"></path> <path fill-rule="evenodd" clip-rule="evenodd" d="M9.94358 3.25C8.10583 3.24998 6.65019 3.24997 5.51098 3.40314C4.33856 3.56076 3.38961 3.89288 2.64124 4.64124C1.89288 5.38961 1.56076 6.33856 1.40314 7.51098C1.24997 8.65019 1.24998 10.1058 1.25 11.9436V12.0564C1.24998 13.8942 1.24997 15.3498 1.40314 16.489C1.56076 17.6614 1.89288 18.6104 2.64124 19.3588C3.38961 20.1071 4.33856 20.4392 5.51098 20.5969C6.65018 20.75 8.1058 20.75 9.94354 20.75H14.0564C15.8942 20.75 17.3498 20.75 18.489 20.5969C19.6614 20.4392 20.6104 20.1071 21.3588 19.3588C22.1071 18.6104 22.4392 17.6614 22.5969 16.489C22.75 15.3498 22.75 13.8942 22.75 12.0565V11.9436C22.75 10.1059 22.75 8.65018 22.5969 7.51098C22.4392 6.33856 22.1071 5.38961 21.3588 4.64124C20.6104 3.89288 19.6614 3.56076 18.489 3.40314C17.3498 3.24997 15.8942 3.24998 14.0564 3.25H9.94358ZM3.7019 5.7019C4.12511 5.27869 4.70476 5.02503 5.71085 4.88976C6.73851 4.75159 8.09318 4.75 10 4.75H14C15.9068 4.75 17.2615 4.75159 18.2892 4.88976C19.2952 5.02503 19.8749 5.27869 20.2981 5.7019C20.7213 6.12511 20.975 6.70476 21.1102 7.71085C21.2484 8.73851 21.25 10.0932 21.25 12C21.25 13.9068 21.2484 15.2615 21.1102 16.2892C20.975 17.2952 20.7213 17.8749 20.2981 18.2981C19.8749 18.7213 19.2952 18.975 18.2892 19.1102C17.2615 19.2484 15.9068 19.25 14 19.25H10C8.09318 19.25 6.73851 19.2484 5.71085 19.1102C4.70476 18.975 4.12511 18.7213 3.7019 18.2981C3.27869 17.8749 3.02503 17.2952 2.88976 16.2892C2.75159 15.2615 2.75 13.9068 2.75 12C2.75 10.0932 2.75159 8.73851 2.88976 7.71085C3.02503 6.70476 3.27869 6.12511 3.7019 5.7019Z" fill="#ada9a9"></path> </g></svg>
+
+ <input type="password" id="password" v-model="password" required placeholder="Password">
+ </div>
+      <div class="form-options">
+        <a href="#" @click.prevent="emit('switch-view', 'forgotPassword')" class="link">
+          Recovery Password
+        </a>
+      </div>
+      <p v-if="error" class="error-message">{{ error }}</p>
+      <button type="submit" :disabled="isLoading">
+        {{ isLoading ? 'Loading...' : 'SIGN IN' }}
+      </button>
+    </form>
+  </div>
+</div>
   </div>
 </template>
-
 <style scoped>
+/* Menggunakan font dari Google Fonts untuk tampilan lebih modern */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 .login-page {
   display: flex;
   height: 100vh;
   width: 100%;
-  background-color: #a50000;
+  font-family: 'Inter', sans-serif;
 }
 
 /* --- Kolom Kiri --- */
 .left-panel {
-  flex: 55%; /* Ambil 55% lebar layar */
+  flex: 50%;
+  /* Warna latar diubah menjadi putih bersih */
   background-color: #ffffff;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
   padding: 3rem;
   border-right: 1px solid #e2e8f0;
+  
+  overflow-y: auto;
 }
 .welcome-content {
-  max-width: 500px;
-  text-align: center;
+  max-width: 480px;
+  text-align: left;
 }
 .logo {
-  max-width: 180px;
-  margin-bottom: 0.5rem;
+  max-width: 220px;
+  margin-bottom: 2.5rem;
 }
 .left-panel h1 {
-  font-size: 2.25rem;
+  font-size: 2.5rem;
   font-weight: 700;
-  color: #1e293b;
+  /* Warna teks utama menggunakan variabel merah */
+  color: var(--primary-color, #d10000);
   margin-bottom: 1rem;
+  line-height: 1.3;
 }
 .left-panel p {
-  color: #64748b;
+  color: #475569; /* Abu-abu gelap untuk deskripsi */
   font-size: 1rem;
   line-height: 1.6;
 }
 .illustration {
   width: 100%;
-  max-width: 450px;
-  margin-top: 2rem;
+  margin-top: 3rem;
 }
 
 /* --- Kolom Kanan --- */
 .right-panel {
-  flex: 45%; /* Ambil 45% lebar layar */
+  flex: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 2rem;
+  background-color: #f8fafc; /* Latar abu-abu sangat terang */
 }
 .login-box {
   width: 100%;
   max-width: 380px;
 }
-.login-box h2 {
-  font-size: 1.8rem;
+.form-title {
+  font-size: 2rem;
   font-weight: 600;
-  margin-bottom: 0.5rem;
-  color: #ffffff;
-}
-.subtitle {
-  color: #f1f1f1;
   margin-bottom: 2rem;
+  color: #111827;
+  text-align: left;
 }
 .input-group {
-  margin-bottom: 1.25rem;
-}
-.input-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 500;
-  color: #ffffff;
+  margin-bottom: 1.5rem;
+  position: relative;
 }
 .input-group input {
   width: 100%;
-  padding: 0.8rem 1rem;
-  border: 1px solid #fffb00;
-  border-radius: 8px;
+  padding: 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px; /* Border radius tegas */
   font-size: 1rem;
+  background-color: #ffffff; /* Latar belakang input putih */
   transition: border-color 0.2s, box-shadow 0.2s;
+  padding-left: 3rem;
 }
 .input-group input:focus {
   outline: none;
-  border-color: var(--secondary-color, #ffffff);
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
+  /* Border focus menggunakan warna biru */
+  border-color: var(--secondary-color, #000a9b);
+  box-shadow: 0 0 0 3px rgba(0, 10, 155, 0.15);
 }
 
-.form-footer {
-  text-align: right;
+.form-options {
+  display: flex;
+  /* Hanya ada satu item, jadi posisikan di akhir (kanan) */
+  justify-content: flex-end;
   margin-bottom: 1.5rem;
-}
-.recover-password {
   font-size: 0.9rem;
-  color: #fffb00;
-  text-decoration: none;
 }
-.recover-password:hover {
+.link {
+  color: var(--secondary-color, #000a9b);
+  text-decoration: none;
+  font-weight: 500;
+}
+.link:hover {
   text-decoration: underline;
 }
 
@@ -192,36 +193,111 @@ const login = async () => {
   color: var(--primary-color, #d10000);
   margin-bottom: 1rem;
   font-weight: 500;
+  text-align: center;
 }
+
 button {
   width: 100%;
   padding: 1rem;
   border: none;
   border-radius: 8px;
-  background-color: var(--primary-color, #d10000);
-  color: white;
+  /* Tombol utama menggunakan warna biru */
+  background-color: #00065a;
+  color: rgb(255, 255, 255);
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.2s;
 }
 button:hover {
-  background-color: #b90000; /* Warna merah sedikit lebih gelap */
+  background-color: #000000; /* Biru sedikit lebih gelap */
+  color:#ffffff;
 }
 button:disabled {
-  background-color: #f87171;
+  background-color: #010830;
   cursor: not-allowed;
 }
+.input-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  color: #9ca3af; /* Warna abu-abu netral */
+  pointer-events: none; /* Agar ikon tidak bisa diklik */
+}
+.mobile-header {
+  display: none; /* Sembunyikan di desktop secara default */
+}
 
-
-/* --- Tampilan Responsif untuk Mobile --- */
-@media (max-width: 992px) {
+@media (max-width: 768px) {
   .left-panel {
-    display: none; /* Sembunyikan kolom kiri di layar kecil */
+    display: none; /* Sembunyikan panel kiri */
   }
+
   .right-panel {
-    flex: 100%; /* Kolom kanan ambil semua lebar */
+    flex: 100%;
+    background-color: #f3f4f6; /* Latar abu-abu terang untuk page */
     padding: 1.5rem;
+    display: flex; /* Tambahkan ini */
+    justify-content: center; /* Tambahkan ini */
+    align-items: center; /* Tambahkan ini */
+  }
+  
+  .login-box {
+    background-color: white;
+    padding: 2.5rem 2rem;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* Tampilkan dan atur gaya header mobile */
+  .mobile-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 2rem;
+    width: 100%;
+  }
+
+  /* Sembunyikan logo desktop di mobile */
+  .logo-desktop {
+    display: none;
+  }
+
+  .logo-mobile {
+    max-width: 150px;
+    margin-bottom: 0.5rem;
+  }
+
+  .mobile-title {
+    color: #4b5563; /* Abu-abu gelap */
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  /* Atur agar form di dalam kartu mengambil lebar penuh */
+ .login-box form {
+  width: 100%; /* Paksa form untuk mengambil lebar penuh kontainer */
+}
+
+  .form-title {
+    text-align: center;
+    font-size: 1.8rem;
+    margin-bottom: 2rem;
+  }
+
+  /* Sesuaikan warna tombol untuk mobile */
+  button {
+    background-color: var(--primary-color, #d10000);
+  }
+  button:hover {
+    background-color: #b90000;
   }
 }
 </style>
