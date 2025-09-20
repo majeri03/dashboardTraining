@@ -165,6 +165,7 @@ const login = async () => {
   background-color: #ffffff; /* Latar belakang input putih */
   transition: border-color 0.2s, box-shadow 0.2s;
   padding-left: 3rem;
+   box-sizing: border-box;
 }
 .input-group input:focus {
   outline: none;

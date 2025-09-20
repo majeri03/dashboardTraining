@@ -183,6 +183,7 @@ const resetPassword = async () => {
   border-radius: 8px;
   font-size: 14px;
   color: var(--text-dark);
+  box-sizing: border-box;
 }
 .input-group input::placeholder {
   color: #9ca3af;
@@ -262,6 +263,22 @@ button:disabled {
     padding: 40px 24px;
     max-width: 640px;
   }
+  .form-card {
+    padding: 32px 24px 56px;
+    max-width: 520px;
+  }
+  /* Sembunyikan judul, subjudul, dan ilustrasi SVG */
+  .brand-title,
+  .brand-subtitle,
+  .brand-illustration {
+    display: none;
+  }
+
+  /* Atur ulang margin bawah logo agar pas */
+  .brand-logo {
+    margin-bottom: 0;
+  }
+  
   .form-card {
     padding: 32px 24px 56px;
     max-width: 520px;

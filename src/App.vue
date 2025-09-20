@@ -14,7 +14,7 @@ import InputAbsensi from './views/InputAbsensi.vue';
 import KonfigurasiDivisi from './views/KonfigurasiDivisi.vue';
 import KonfigurasiBulanan from './views/KonfigurasiBulanan.vue';
 import Notification from './components/Notification.vue';
-
+import GoogleFormLink from './views/GoogleFormLink.vue';
 // State untuk melacak pengguna yang login
 const user = ref(null);
 const isAuthReady = ref(false); // Untuk mencegah flicker
@@ -31,6 +31,7 @@ const views = {
   InputAbsensi,
   KonfigurasiDivisi,
   KonfigurasiBulanan,
+  GoogleFormLink,
 };
 
 const isSidebarOpen = ref(false);
