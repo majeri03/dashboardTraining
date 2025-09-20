@@ -30,9 +30,7 @@ coverage
 *.tsbuildinfo
 
 # Env (root)
- /.env
- /.env.*
-
-# Vite config (root)
+.env
+.env.*
 
 
