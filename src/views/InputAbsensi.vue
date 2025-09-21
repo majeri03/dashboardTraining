@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, watch, computed } from 'vue'; // Tambahkan computed
 import axios from 'axios';
-
+import apiClient from '../api'
 const apiUrl = import.meta.env.VITE_API_URL;
 
 // State untuk form
@@ -75,7 +75,6 @@ const submitForm = async () => {
   error.value = null;
   successMessage.value = '';
 
-  // 1. Data absensi yang akan dikirim (ini sudah benar)
   const submissionData = {
     judulTraining: selectedTraining.value
   };
@@ -93,9 +92,7 @@ const submitForm = async () => {
 
   try {
     // 3. Kirim 'finalPayload' yang sudah lengkap
-    const response = await axios.post(apiUrl, finalPayload, {
-      headers: { 'Content-Type': 'application/json' }
-    });
+    const response = await apiClient.post('', finalPayload);
 
     if (response.data.status === 'success') {
       successMessage.value = response.data.message;

@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, computed, inject } from 'vue';
 import axios from 'axios';
-
+import apiClient from '../api';
 const apiUrl = import.meta.env.VITE_API_URL;
 const showNotification = inject('showNotification');
 // State untuk data utama
@@ -88,7 +88,7 @@ const handleSubmit = async () => {
     let response;
     if (modalMode.value === 'add') {
       const payload = { action: 'addBulanan', payload: currentItem.value };
-      response = await axios.post(apiUrl, payload);
+      response = await apiClient.post('', payload);
     } else {
       const payload = { 
         action: 'updateBulanan', 
@@ -98,7 +98,7 @@ const handleSubmit = async () => {
           originalBulan: originalItem.value.bulan
         }
       };
-      response = await axios.post(apiUrl, payload);
+      response = await apiClient.post('', payload);
     }
 
     if (response.data.status === 'success') {
@@ -119,7 +119,7 @@ const deleteItem = async (item) => {
   if (confirm(`Yakin hapus konfigurasi untuk ${item.bulan} ${item.tahun}?`)) {
     try {
       const payload = { action: 'deleteBulanan', payload: { tahun: item.tahun, bulan: item.bulan } };
-      const response = await axios.post(apiUrl, payload);
+      const response = await apiClient.post('', payload);
 
       if (response.data.status === 'success') {
         await fetchData();
