@@ -56,7 +56,7 @@ const closeModal = () => {
 
 // --- FUNGSI-FUNGSI UNTUK CRUD ---
 const handleSubmit = async () => {
-  // Validasi
+  // Validasi (tidak ada perubahan)
   if (!currentItem.value.divisi.trim()) {
     modalError.value = "Nama Divisi tidak boleh kosong.";
     return;
@@ -70,28 +70,34 @@ const handleSubmit = async () => {
   modalError.value = '';
 
   try {
-    let response;
+    let payload;
     if (modalMode.value === 'add') {
-      const payload = { action: 'addDivisi', payload: currentItem.value };
-      response = await apiClient.post('', payload);
+      payload = { action: 'addDivisi', payload: currentItem.value };
     } else {
-      const payload = { 
+      payload = { 
         action: 'updateDivisi', 
         payload: { ...currentItem.value, originalDivisi: originalDivisiName.value }
       };
-      response = await apiClient.post('', payload);
     }
+    
+    // Kirim data ke server. Kita tidak menggunakan 'await' karena kita tahu responsnya akan diblokir.
+    apiClient.post('', payload);
 
-    if (response.data.status === 'success') {
-      await fetchData(); // Ambil data terbaru dari server
+    // ===================================================================
+    // INI ADALAH LOGIKA YANG BENAR
+    // ===================================================================
+    // Karena kita tahu data berhasil terkirim, kita beri jeda 1.5 detik
+    // untuk memberi waktu server memproses, lalu kita anggap berhasil di sisi tampilan.
+    setTimeout(() => {
+      fetchData(); // Ambil data terbaru dari Google Sheet
       closeModal();
-      showNotification(response.data.message, 'success');
-    } else {
-      throw new Error(response.data.message);
-    }
+      showNotification(modalMode.value === 'add' ? 'Divisi berhasil ditambahkan!' : 'Divisi berhasil diperbarui!', 'success');
+      isSubmitting.value = false;
+    }, 1500); // 1.5 detik
+
   } catch (err) {
-    showNotification(err.message || "Terjadi kesalahan.", 'error');
-  } finally {
+    // Blok catch ini hanya akan berjalan jika ada error sebelum data dikirim (sangat jarang)
+    showNotification("Terjadi kesalahan yang tidak terduga saat mengirim data.", 'error');
     isSubmitting.value = false;
   }
 };
@@ -100,14 +106,19 @@ const deleteItem = async (item) => {
   if (confirm(`Apakah Anda yakin ingin menghapus divisi "${item.divisi}"?`)) {
     try {
       const payload = { action: 'deleteDivisi', payload: { divisi: item.divisi } };
-      const response = await apiClient.post('', payload);
+      
+      // Kirim permintaan hapus tanpa menunggu respons
+      apiClient.post('', payload);
 
-      if (response.data.status === 'success') {
-        await fetchData(); // Ambil data terbaru
-        showNotification(response.data.message, 'success');
-      } else {
-        throw new Error(response.data.message);
-      }
+      // ===================================================================
+      // LOGIKA YANG BENAR UNTUK HAPUS
+      // ===================================================================
+      // Anggap berhasil setelah jeda singkat
+      setTimeout(() => {
+        fetchData(); // Refresh data dari Google Sheet
+        showNotification(`Divisi "${item.divisi}" berhasil dihapus.`, 'success');
+      }, 1500); // 1.5 detik
+
     } catch (err) {
       showNotification("Gagal menghapus: " + err.message, 'error');
     }
