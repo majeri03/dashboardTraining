@@ -5,13 +5,12 @@ import BarChart from '../components/BarChart.vue';
 import KpiCard from '../components/KpiCard.vue';
 import DoughnutChart from '../components/DoughnutChart.vue';
 import LineChart from '../components/LineChart.vue';
-import SparklineChart from '../components/SparklineChart.vue'; // [BARU] Impor komponen sparkline
+import SparklineChart from '../components/SparklineChart.vue'; 
 import RadialProgress from '../components/RadialProgress.vue';
 import TimeReminder from '../components/TimeReminder.vue';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 const currentYear = new Date().getFullYear();
-// State untuk data
 const monthlyData = ref(null);
 const yearlyTrendData = ref(null);
 const isLoading = ref(true);
@@ -19,7 +18,6 @@ const error = ref(null);
 
 const months = ref([...Array(12).keys()].map(i => ({ value: i + 1, name: new Date(0, i).toLocaleString('id-ID', { month: 'long' }) })));
 
-// --- Computed Properties ---
 
 const kpiMetrics = computed(() => {
   if (!monthlyData.value?.summary) return null;
@@ -67,7 +65,6 @@ const intExtChart = computed(() => {
   };
 });
 
-// [BARU] Computed property untuk data tren PESERTA
 const participantTrendChart = computed(() => {
   if (!yearlyTrendData.value?.monthlyParticipants) return null;
   return {
@@ -81,14 +78,13 @@ const participantTrendChart = computed(() => {
   }
 });
 
-// [BARU] Computed property untuk data tren JAM
 const hoursTrendChart = computed(() => {
   if (!yearlyTrendData.value?.monthlyHours) return null;
   return {
     labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
     datasets: [{
       data: yearlyTrendData.value.monthlyHours,
-      borderColor: '#3B82F6', // Warna Biru
+      borderColor: '#3B82F6', 
       borderWidth: 2,
       tension: 0.4
     }]
@@ -102,9 +98,7 @@ const currentMonthAndYear = computed(() => {
   return `${monthName} ${year}`;
 });
 
-// --- [PASTE KODE BARU DI SINI] ---
 
-// 1. Data mentah untuk tren harian
 const dailyTrendsData = computed(() => {
   if (!monthlyData.value?.trainings || monthlyData.value.trainings.length === 0) return null;
 
@@ -132,7 +126,6 @@ const dailyTrendsData = computed(() => {
   };
 });
 
-// 2. Data & Opsi untuk grafik PESERTA HARIAN
 const dailyParticipantsChart = computed(() => {
   if (!dailyTrendsData.value) return null;
   return {
@@ -147,11 +140,11 @@ const dailyParticipantsChart = computed(() => {
       backgroundColor: (ctx) => {
         const chart = ctx.chart
         const { ctx: c, chartArea } = chart
-        if (!chartArea) return null // untuk mencegah error saat render awal
+        if (!chartArea) return null
 
         const gradient = c.createLinearGradient(0, chartArea.top, 0, chartArea.bottom)
-        gradient.addColorStop(0, 'rgba(239,68,68,0.6)') // merah pekat di atas
-        gradient.addColorStop(1, 'rgba(239,68,68,0.0)') // transparan ke bawah
+        gradient.addColorStop(0, 'rgba(239,68,68,0.6)') 
+        gradient.addColorStop(1, 'rgba(239,68,68,0.0)') 
         return gradient
       },
       pointRadius: 0,
@@ -172,7 +165,6 @@ const dailyParticipantsOptions = ref({
   }
 });
 
-// 3. Data & Opsi untuk grafik JAM HARIAN
 const dailyHoursChart = computed(() => {
   if (!dailyTrendsData.value) return null;
   return {
@@ -189,10 +181,9 @@ const dailyHoursChart = computed(() => {
         const { ctx: c, chartArea } = chart
         if (!chartArea) return null
 
-        // Gradient biru → transparan
         const gradient = c.createLinearGradient(0, chartArea.top, 0, chartArea.bottom)
-        gradient.addColorStop(0, 'rgba(59,130,246,0.6)') // biru pekat di atas
-        gradient.addColorStop(1, 'rgba(59,130,246,0.0)') // transparan di bawah
+        gradient.addColorStop(0, 'rgba(59,130,246,0.6)') 
+        gradient.addColorStop(1, 'rgba(59,130,246,0.0)') 
         return gradient
       },
       pointRadius: 0,
@@ -238,11 +229,9 @@ const fetchAllDashboardData = async () => {
 };
 
 
-// --- TAMBAHKAN STATE BARU UNTUK METRIK KEPUASAN ---
 const satisfactionData = ref(null);
 const isSatisfactionLoading = ref(true);
 
-// --- BUAT FUNGSI BARU UNTUK MENGAMBIL DATA KEPUASAN ---
 const fetchSatisfactionData = async () => {
   isSatisfactionLoading.value = true;
   try {
@@ -250,15 +239,15 @@ const fetchSatisfactionData = async () => {
     satisfactionData.value = response.data;
   } catch (err) {
     console.error("Gagal memuat metrik kepuasan:", err);
-    satisfactionData.value = null; // Gagal memuat, jangan tampilkan apa-apa
+    satisfactionData.value = null; 
   } finally {
     isSatisfactionLoading.value = false;
   }
 };
 
 onMounted(() => {
-  fetchAllDashboardData(); // Fungsi lama Anda, tetap berjalan seperti biasa
-  fetchSatisfactionData(); // Panggil fungsi baru ini secara terpisah
+  fetchAllDashboardData(); 
+  fetchSatisfactionData(); 
 });
 
 const iconPeserta = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -368,7 +357,6 @@ const iconPencapaian = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" view
 </template>
 
 <style scoped>
-/* (Style .header, .kpi-grid, .dashboard-grid, .card, dan lainnya tetap sama) */
 .header { margin-bottom: 2rem; }
 .header-title { margin: 0; color: var(--primary-color, #5356FF); }
 .header-subtitle { margin: 0; color: #6b7280; }
@@ -380,7 +368,6 @@ const iconPencapaian = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" view
 .card-title { font-size: 1.1rem; font-weight: 600; margin-top: 0; margin-bottom: 1.5rem; }
 .chart-container { position: relative; height: 300px; flex-grow: 1; }
 
-/* [BARU] Style untuk Grup Insight */
 .insight-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -424,7 +411,7 @@ const iconPencapaian = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" view
 
 .chart-container-large {
   position: relative;
-  height: 450px; /* <-- UBAH NILAI INI */
+  height: 450px;
 }
 
 .daily-trends-grid {
@@ -435,9 +422,9 @@ const iconPencapaian = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" view
 .header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start; /* Ubah ke flex-start agar tidak meregang */
+  align-items: flex-start; 
   gap: 2rem;
-  flex-wrap: wrap; /* Izinkan wrap di layar kecil */
+  flex-wrap: wrap; 
 }
 
 .header-metrics-group {
@@ -445,7 +432,6 @@ const iconPencapaian = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" view
   gap: 1.5rem;
   align-items: center;
   
-  /* PENTING: Mencegah grup ini meregang melebihi lebar layar */
   min-width: 0; 
 }
 
@@ -460,16 +446,13 @@ const iconPencapaian = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" view
 
 @media (max-width: 900px) {
   .header-metrics-group {
-    /* Di layar kecil, biarkan grup ini memenuhi lebar yang tersedia */
     flex-grow: 1;
   }
   
   .satisfaction-grid {
-    overflow-x: auto; /* Izinkan scroll horizontal */
-    flex-wrap: nowrap; /* Pastikan item tidak turun ke bawah */
-    flex-grow: 1; /* Biarkan dia meregang memenuhi .header-metrics-group */
-    
-    /* Sembunyikan scrollbar agar rapi */
+    overflow-x: auto; 
+    flex-wrap: nowrap;
+    flex-grow: 1; 
     -ms-overflow-style: none;
     scrollbar-width: none;
   }

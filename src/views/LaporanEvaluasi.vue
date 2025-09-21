@@ -3,10 +3,8 @@ import { ref, onMounted, computed } from 'vue';
 import axios from 'axios';
 import ProgressBar from '../components/ProgressBar.vue';
 
-// PASTE URL WEB APP ANDA DARI HASIL DEPLOY TERAKHIR
 const apiUrl = import.meta.env.VITE_API_URL;
 
-// --- [FINAL] KONFIGURASI TABEL YANG AKURAT ---
 const tableHeaders = ref([
   { key: 'namaLengkap', label: 'Nama Karyawan', sortable: true,isRating: false },
   { key: 'divisi', label: 'Divisi', sortable: true, isRating: false },
@@ -177,7 +175,7 @@ th.sorted { color: var(--secondary-color, #f36f21); }
   flex-wrap: wrap;
 }
 .search-input {
-  flex-grow: 1; /* Biarkan search input memanjang */
+  flex-grow: 1; 
 }
 .btn-refresh {
   padding: 0.75rem 1.5rem;
@@ -192,7 +190,6 @@ th.sorted { color: var(--secondary-color, #f36f21); }
   background-color: #f0f0f0;
 }
 
-/* [BARU] Style untuk Pagination */
 .pagination-controls {
   display: flex;
   justify-content: center;

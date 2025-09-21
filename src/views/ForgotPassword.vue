@@ -30,7 +30,6 @@ const resetPassword = async () => {
 
 <template>
   <div class="auth-layout">
-    <!-- Panel Kiri (brand) -->
     <div class="brand-panel">
       <div class="brand-inner">
         <img src="/images/logo.png" alt="Logo" class="brand-logo" />
@@ -42,14 +41,12 @@ const resetPassword = async () => {
           Silakan masuk untuk mengelola dan memantau semua data aktivitas training Anda.
         </p>
 
-        <!-- Ilustrasi opsional -->
         <div class="brand-illustration" aria-hidden="true">
           <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 48 48"><path fill="#000000" fill-rule="evenodd" d="M6 6h31v5h-2V8H8v23h21.387v2H6V6Zm30 13a3 3 0 1 0 0-6a3 3 0 0 0 0 6Zm2.031 2.01c1.299 0 2.327.584 3 1.486c.629.845.895 1.89.955 2.855a7.626 7.626 0 0 1-.397 2.92c-.3.87-.807 1.77-1.589 2.387V40.5a1.5 1.5 0 0 1-2.98.247L35.73 33h-.298l-1.458 7.776A1.5 1.5 0 0 1 31 40.5V26.233a63.223 63.223 0 0 0-.592.919l-.078.123l-.02.032l-.005.009a1.5 1.5 0 0 1-1.274.707h-5a1.5 1.5 0 1 1 0-3h4.177c.243-.376.563-.864.899-1.354c.35-.511.736-1.052 1.08-1.476c.167-.207.354-.423.542-.6c.092-.087.22-.2.376-.3a1.72 1.72 0 0 1 .926-.282h6Z" clip-rule="evenodd"/></svg>
         </div>
       </div>
     </div>
 
-    <!-- Panel Kanan (form) -->
     <div class="form-panel">
       <div class="form-card">
         <h2 class="form-title">Lupa Password</h2>
@@ -88,7 +85,6 @@ const resetPassword = async () => {
 <style scoped>
 
 
-/* ===== Layout Utama (2 kolom) ===== */
 .auth-layout {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -96,7 +92,6 @@ const resetPassword = async () => {
   background: #fff;
 }
 
-/* ===== Panel Kiri (Brand) ===== */
 .brand-panel {
   background: #ffffff;
   border-right: 1px solid #eef2f7;
@@ -133,7 +128,6 @@ const resetPassword = async () => {
   height: 120px;
 }
 
-/* ===== Panel Kanan (Form) ===== */
 .form-panel {
   background: var(--panel-bg);
   display: flex;
@@ -156,7 +150,6 @@ const resetPassword = async () => {
   margin: 0 0 24px 0;
 }
 
-/* ===== Form ===== */
 .auth-form {
   width: 100%;
 }
@@ -177,7 +170,7 @@ const resetPassword = async () => {
 .input-group input {
   width: 100%;
   height: 44px;
-  padding: 0 14px 0 42px; /* ruang untuk ikon kiri */
+  padding: 0 14px 0 42px; 
   background: #fff;
   border: 1px solid #4d4d4d;
   border-radius: 8px;
@@ -246,7 +239,6 @@ button:disabled {
   text-decoration: underline;
 }
 
-/* ===== Responsif (tablet/ponsel) ===== */
 @media (max-width: 1024px) {
   .brand-title { font-size: 36px; }
   .brand-inner { padding: 56px 48px; }
@@ -267,14 +259,12 @@ button:disabled {
     padding: 32px 24px 56px;
     max-width: 520px;
   }
-  /* Sembunyikan judul, subjudul, dan ilustrasi SVG */
   .brand-title,
   .brand-subtitle,
   .brand-illustration {
     display: none;
   }
 
-  /* Atur ulang margin bawah logo agar pas */
   .brand-logo {
     margin-bottom: 0;
   }

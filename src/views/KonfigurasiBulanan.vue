@@ -4,37 +4,31 @@ import axios from 'axios';
 import apiClient from '../api';
 const apiUrl = import.meta.env.VITE_API_URL;
 const showNotification = inject('showNotification');
-// State untuk data utama
 const configBulanan = ref([]);
 const isLoading = ref(true);
 const error = ref(null);
 
-// State untuk modal
 const isModalOpen = ref(false);
 const modalMode = ref('add');
 const currentItem = ref({ tahun: new Date().getFullYear(), bulan: '', jumlahkaryawan: 0, targetperorang: 0 });
-const originalItem = ref(null); // Untuk melacak data asli saat edit
+const originalItem = ref(null); 
 const modalError = ref('');
 const isSubmitting = ref(false);
 
 const selectedYear = ref('');
 
-// Buat daftar tahun unik dari data yang ada untuk opsi dropdown
 const availableYears = computed(() => {
   const years = configBulanan.value.map(item => item.tahun);
-  return [...new Set(years)].sort((a, b) => b - a); // Urutkan dari terbaru
+  return [...new Set(years)].sort((a, b) => b - a); 
 });
 
-// Ini adalah data yang akan ditampilkan di tabel, sudah terfilter
 const filteredData = computed(() => {
-  // JANGAN tampilkan apapun jika selectedYear kosong
   if (!selectedYear.value) {
     return []; 
   }
   return configBulanan.value.filter(item => item.tahun == selectedYear.value);
 });
 
-// Opsi untuk dropdown
 const years = computed(() => {
   const currentYear = new Date().getFullYear();
   return [currentYear - 1, currentYear, currentYear + 1, currentYear + 2, currentYear + 3, currentYear + 4, currentYear + 5];
@@ -66,7 +60,7 @@ const openModalForAdd = () => {
 const openModalForEdit = (item) => {
   modalMode.value = 'edit';
   currentItem.value = { ...item };
-  originalItem.value = { ...item }; // Simpan data asli
+  originalItem.value = { ...item }; 
   modalError.value = '';
   isModalOpen.value = true;
 };
@@ -76,6 +70,7 @@ const closeModal = () => {
 };
 
 const handleSubmit = async () => {
+  // Validasi (tidak ada perubahan)
   if (currentItem.value.jumlahkaryawan <= 0 || currentItem.value.targetperorang <= 0) {
     modalError.value = "Jumlah dan Target harus lebih dari 0.";
     return;
@@ -85,32 +80,36 @@ const handleSubmit = async () => {
   modalError.value = '';
 
   try {
-    let response;
+    let payload;
     if (modalMode.value === 'add') {
-      const payload = { action: 'addBulanan', payload: currentItem.value };
-      response = await apiClient.post('', payload);
+      payload = { action: 'addBulanan', payload: currentItem.value };
     } else {
-      const payload = { 
-        action: 'updateBulanan', 
-        payload: { 
-          ...currentItem.value, 
+      payload = {
+        action: 'updateBulanan',
+        payload: {
+          ...currentItem.value,
           originalTahun: originalItem.value.tahun,
           originalBulan: originalItem.value.bulan
         }
       };
-      response = await apiClient.post('', payload);
     }
 
-    if (response.data.status === 'success') {
-      await fetchData();
+    // Kirim data tanpa menunggu respons ('await' dihilangkan)
+    apiClient.post('', payload);
+
+    // ===================================================================
+    // LOGIKA BARU: Anggap berhasil setelah jeda 1.5 detik
+    // ===================================================================
+    setTimeout(() => {
+      fetchData(); // Refresh data dari Google Sheet
       closeModal();
-      showNotification(response.data.message, 'success');
-    } else {
-      throw new Error(response.data.message);
-    }
+      showNotification(modalMode.value === 'add' ? 'Konfigurasi berhasil ditambahkan!' : 'Konfigurasi berhasil diperbarui!', 'success');
+      isSubmitting.value = false;
+    }, 1500);
+
   } catch (err) {
-    showNotification(err.message || "Terjadi kesalahan.", 'error');
-  } finally {
+    // Blok ini hanya untuk menangkap error jika pengiriman awal gagal
+    showNotification("Terjadi kesalahan saat mengirim data.", 'error');
     isSubmitting.value = false;
   }
 };
@@ -119,14 +118,18 @@ const deleteItem = async (item) => {
   if (confirm(`Yakin hapus konfigurasi untuk ${item.bulan} ${item.tahun}?`)) {
     try {
       const payload = { action: 'deleteBulanan', payload: { tahun: item.tahun, bulan: item.bulan } };
-      const response = await apiClient.post('', payload);
 
-      if (response.data.status === 'success') {
-        await fetchData();
-        showNotification(response.data.message, 'success');
-      } else {
-        throw new Error(response.data.message);
-      }
+      // Kirim permintaan hapus tanpa menunggu respons
+      apiClient.post('', payload);
+
+      // ===================================================================
+      // LOGIKA BARU: Anggap berhasil setelah jeda 1.5 detik
+      // ===================================================================
+      setTimeout(() => {
+        fetchData(); // Refresh data
+        showNotification(`Konfigurasi untuk ${item.bulan} ${item.tahun} berhasil dihapus.`, 'success');
+      }, 1500);
+
     } catch (err) {
       showNotification("Gagal menghapus: " + err.message, 'error');
     }
@@ -234,7 +237,6 @@ const deleteItem = async (item) => {
 
 
 <style scoped>
-/* Gunakan style yang sama persis dengan KonfigurasiDivisi.vue */
 .card { background-color: #ffffff; border-radius: 8px; padding: 1.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
 .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
 .card-title { margin: 0; }

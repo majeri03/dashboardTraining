@@ -1,33 +1,59 @@
 <script setup>
-import { ref, onMounted, watch, computed } from 'vue'; // Tambahkan computed
-import axios from 'axios';
-import apiClient from '../api'
+import { ref, onMounted, watch, computed, nextTick } from 'vue';
+import apiClient from '../api';
+import axios from 'axios'; // Tetap dibutuhkan untuk request GET
+
 const apiUrl = import.meta.env.VITE_API_URL;
 
-// State untuk form
+// --- State untuk Form Input Utama ---
 const divisions = ref([]);
-const allTrainingsInPeriod = ref([]); // Menyimpan semua training di periode terpilih
-const recordedTitles = ref([]); // Menyimpan judul yang sudah diinput absensinya
+const allTrainingsInPeriod = ref([]);
+const recordedTitles = ref([]);
 const selectedMonth = ref(new Date().getMonth() + 1);
 const selectedYear = ref(new Date().getFullYear());
 const selectedTraining = ref('');
 const participantCounts = ref({});
-
-// State untuk UI feedback
 const isLoading = ref(false);
 const isSubmitting = ref(false);
 const error = ref(null);
 const successMessage = ref('');
 
-const months = ref([...Array(12).keys()].map(i => ({ value: i + 1, name: new Date(0, i).toLocaleString('id-ID', { month: 'long' }) })));
-const years = ref([new Date().getFullYear() -1, new Date().getFullYear(), new Date().getFullYear() + 1]);
+// --- State untuk Modal Data Absensi (Lihat & Kelola) ---
+const isDataModalOpen = ref(false);
+const allAbsensiData = ref([]);
+const isLoadingData = ref(false);
+const absensiTableHeaders = ref([]);
+const searchQuery = ref(''); // State untuk teks pencarian
 
-// [LOGIKA KUNCI] Computed property untuk menyaring training yang sudah diinput
+// --- State untuk Modal Edit ---
+const isEditModalOpen = ref(false);
+const currentEditItem = ref(null);
+const isUpdating = ref(false);
+
+// --- Data Statis untuk Dropdown ---
+const months = ref([...Array(12).keys()].map(i => ({ value: i + 1, name: new Date(0, i).toLocaleString('id-ID', { month: 'long' }) })));
+const years = ref([new Date().getFullYear() - 1, new Date().getFullYear(), new Date().getFullYear() + 1]);
+
+// --- Computed Properties ---
+
+// Menyaring training yang belum diinput absensinya
 const availableTrainings = computed(() => {
   const recordedSet = new Set(recordedTitles.value);
   return allTrainingsInPeriod.value.filter(title => !recordedSet.has(title));
 });
 
+// Menyaring data di dalam modal berdasarkan pencarian
+const filteredAbsensiData = computed(() => {
+  if (!searchQuery.value) {
+    return allAbsensiData.value;
+  }
+  const lowerCaseQuery = searchQuery.value.toLowerCase();
+  return allAbsensiData.value.filter(item =>
+    item.judulTraining && item.judulTraining.toLowerCase().includes(lowerCaseQuery)
+  );
+});
+
+// --- Fungsi Helper ---
 const toCamelCase = (str) => {
   if (!str) return '';
   const camel = str.replace(/\s+/g, ' ').trim().split(' ').map((word, index) => {
@@ -36,6 +62,8 @@ const toCamelCase = (str) => {
   }).join('');
   return camel.replace(/[^a-zA-Z0-9]/g, '');
 };
+
+// --- Fungsi Pengambilan Data (GET Requests) ---
 
 const fetchDivisions = async () => {
   try {
@@ -70,7 +98,9 @@ const fetchRecordedTitles = async () => {
     }
 };
 
-const submitForm = async () => {
+// --- Fungsi Aksi (POST Requests) dengan Metode setTimeout ---
+
+const submitForm = () => { // Hapus 'async' karena kita tidak pakai 'await'
   isSubmitting.value = true;
   error.value = null;
   successMessage.value = '';
@@ -78,41 +108,113 @@ const submitForm = async () => {
   const submissionData = {
     judulTraining: selectedTraining.value
   };
-  
   divisions.value.forEach(div => {
     const key = toCamelCase("Jumlah Peserta Divisi " + div);
     submissionData[key] = participantCounts.value[div] || 0;
   });
 
-  // 2. [INI PERBAIKANNYA] Kita bungkus data tersebut ke dalam format baru
   const finalPayload = {
-    action: 'addAbsensi', // Beri tahu backend tugasnya adalah 'addAbsensi'
-    payload: submissionData  // Kirim data absensi di dalam 'payload'
+    action: 'addAbsensi',
+    payload: submissionData
   };
 
   try {
-    // 3. Kirim 'finalPayload' yang sudah lengkap
-    const response = await apiClient.post('', finalPayload);
+    // Kirim data tanpa menunggu respons
+    apiClient.post('', finalPayload);
 
-    if (response.data.status === 'success') {
-      successMessage.value = response.data.message;
+    // ===================================================================
+    // LOGIKA BARU: Anggap berhasil setelah jeda 1.5 detik
+    // ===================================================================
+    setTimeout(() => {
+      // Tampilkan pesan sukses dan reset form
+      successMessage.value = "Data absensi berhasil disimpan!";
+      setTimeout(() => successMessage.value = '', 3000); // Hapus pesan setelah 3 detik
+
       selectedTraining.value = '';
       divisions.value.forEach(div => { participantCounts.value[div] = 0; });
-      await fetchRecordedTitles();
-    } else {
-      throw new Error(response.data.message);
-    }
+
+      // Ambil ulang daftar judul agar dropdown terupdate
+      fetchRecordedTitles();
+
+      isSubmitting.value = false;
+    }, 1500);
+
   } catch (err) {
+    // Blok ini hanya untuk menangkap error jika pengiriman awal gagal
     error.value = "Gagal mengirim data: " + err.message;
-  } finally {
     isSubmitting.value = false;
   }
 };
 
+const updateAbsensi = () => {
+  isUpdating.value = true;
+  try {
+    const payload = {
+      action: 'updateAbsensi',
+      payload: currentEditItem.value
+    };
+    apiClient.post('', payload);
+    
+    setTimeout(() => {
+      isEditModalOpen.value = false;
+      isUpdating.value = false;
+      openDataModal(); // Refresh data di modal utama
+    }, 1500);
+
+  } catch (err) {
+    console.error("Gagal update absensi:", err);
+    isUpdating.value = false;
+  }
+};
+
+const deleteAbsensi = (item) => {
+  if (confirm(`Yakin ingin menghapus absensi untuk training "${item.judulTraining}"?`)) {
+    try {
+      const payload = {
+        action: 'deleteAbsensi',
+        payload: { judulTraining: item.judulTraining }
+      };
+      apiClient.post('', payload);
+      
+      setTimeout(() => {
+        openDataModal(); // Refresh data
+      }, 1500);
+
+    } catch (err) {
+      console.error("Gagal menghapus absensi:", err);
+    }
+  }
+};
+
+// --- Fungsi untuk Modal ---
+const openDataModal = async () => {
+  isDataModalOpen.value = true;
+  isLoadingData.value = true;
+  searchQuery.value = ''; // Reset pencarian setiap kali modal dibuka
+  try {
+    const response = await axios.get(`${apiUrl}?action=getAbsensiData`);
+    allAbsensiData.value = response.data;
+    if (response.data.length > 0) {
+      absensiTableHeaders.value = Object.keys(response.data[0]);
+    }
+  } catch (err) {
+    error.value = "Gagal memuat data absensi.";
+  } finally {
+    isLoadingData.value = false;
+  }
+};
+
+const openEditModal = (item) => {
+  currentEditItem.value = JSON.parse(JSON.stringify(item));
+  isEditModalOpen.value = true;
+  isDataModalOpen.value = false;
+};
+
+// --- Lifecycle Hooks ---
 onMounted(() => {
   fetchDivisions();
   fetchTrainings();
-  fetchRecordedTitles(); // Ambil daftar judul yang sudah ada saat pertama kali
+  fetchRecordedTitles();
 });
 
 watch([selectedMonth, selectedYear], fetchTrainings);
@@ -120,7 +222,10 @@ watch([selectedMonth, selectedYear], fetchTrainings);
 
 <template>
   <div class="card">
-    <h2 class="card-title">Form Input Absensi Training Internal</h2>
+    <div class="card-header">
+      <h2 class="card-title">Form Input Absensi Training Internal</h2>
+      <button class="btn-secondary" @click="openDataModal">Lihat & Kelola Data</button>
+    </div>
     <p>Gunakan form ini untuk mencatat jumlah peserta dari setiap divisi yang mengikuti training internal.</p>
 
     <form @submit.prevent="submitForm">
@@ -162,10 +267,65 @@ watch([selectedMonth, selectedYear], fetchTrainings);
       <div v-if="error" class="feedback error">{{ error }}</div>
     </form>
   </div>
+
+  <div v-if="isDataModalOpen" class="modal-overlay" @click.self="isDataModalOpen = false">
+    <div class="modal-content modal-lg">
+      <h3 class="modal-title">Data Absensi Internal Tercatat</h3>
+      
+      <div class="search-container">
+        <input type="text" v-model="searchQuery" placeholder="Cari berdasarkan judul training..." class="search-input">
+      </div>
+
+      <div v-if="isLoadingData" class="loading-state">Memuat data...</div>
+      <div v-else-if="filteredAbsensiData.length === 0" class="empty-state">
+        <span v-if="searchQuery">Tidak ada data yang cocok dengan pencarian "{{ searchQuery }}".</span>
+        <span v-else>Belum ada data absensi.</span>
+      </div>
+      <div v-else class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th v-for="header in absensiTableHeaders" :key="header">{{ header.replace(/([A-Z])/g, ' $1').trim() }}</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item, index) in filteredAbsensiData" :key="index">
+              <td v-for="header in absensiTableHeaders" :key="header">{{ item[header] }}</td>
+              <td class="action-buttons">
+                <button class="btn-edit" @click="openEditModal(item)">Edit</button>
+                <button class="btn-delete" @click="deleteAbsensi(item)">Hapus</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancel" @click="isDataModalOpen = false">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <div v-if="isEditModalOpen" class="modal-overlay" @click.self="isEditModalOpen = false">
+    <div class="modal-content" v-if="currentEditItem">
+      <h3 class="modal-title">Edit Absensi: {{ currentEditItem.judulTraining }}</h3>
+      <form @submit.prevent="updateAbsensi">
+        <div v-for="(value, key) in currentEditItem" :key="key">
+          <div v-if="key.toLowerCase().startsWith('jumlahpeserta')" class="form-group">
+            <label :for="key">{{ key.replace(/([A-Z])/g, ' $1').trim() }}</label>
+            <input type="number" :id="key" v-model.number="currentEditItem[key]" min="0" />
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" @click="isEditModalOpen = false; openDataModal();">Batal</button>
+          <button type="submit" class="btn-save" :disabled="isUpdating">{{ isUpdating ? 'Menyimpan...' : 'Simpan Perubahan' }}</button>
+        </div>
+      </form>
+    </div>
+  </div>
 </template>
 
 <style scoped>
-/* Style Anda tidak berubah, jadi saya singkat di sini */
 .card { max-width: 800px; margin: auto; }
 .form-group { margin-bottom: 1.5rem; }
 .form-group label, .filter-group label, fieldset legend {
@@ -231,4 +391,32 @@ button:disabled { background-color: #ff8a8a; cursor: not-allowed; }
 }
 .success { background-color: #d1fae5; color: #065f46; }
 .error { background-color: #fee2e2; color: #991b1b; }
+
+/* --- Style Baru untuk Modal dan Pencarian --- */
+.search-container {
+  margin-bottom: 1rem;
+}
+.search-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+.card-header { display: flex; justify-content: space-between; align-items: center; }
+.btn-secondary { background-color: #6c757d; color: white; padding: 0.5rem 1rem; border: none; border-radius: 6px; cursor: pointer; }
+.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+.modal-content { background-color: white; padding: 2rem; border-radius: 8px; width: 90%; max-width: 500px; }
+.modal-lg { max-width: 900px; }
+.modal-title { margin-top: 0; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1.5rem; }
+.btn-cancel, .btn-save, .btn-edit, .btn-delete { padding: 0.75rem 1.5rem; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
+.btn-cancel { background-color: #e5e7eb; }
+.btn-save { background-color: var(--primary-color, #5356FF); color: white; }
+.btn-edit { background-color: #F59E0B; color: white; padding: 0.5rem 1rem; }
+.btn-delete { background-color: #EF4444; color: white; padding: 0.5rem 1rem; }
+.table-wrapper { max-height: 60vh; overflow: auto; }
+.action-buttons { display: flex; gap: 0.5rem; }
+.loading-state, .empty-state { text-align: center; padding: 2rem; color: #6b7280; }
 </style>

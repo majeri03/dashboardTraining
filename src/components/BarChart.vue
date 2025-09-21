@@ -17,7 +17,7 @@ const chartOptions = ref({
   maintainAspectRatio: false,
   plugins: {
     legend: {
-      display: false, // Sembunyikan legenda jika tidak perlu
+      display: false, 
     }
   },
   scales: {

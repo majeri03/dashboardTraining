@@ -39,21 +39,20 @@ const barColor = computed(() => {
 </template>
 
 <style scoped>
-/* 'scoped' berarti style ini hanya berlaku untuk komponen ini */
 .progress-bar-container {
   display: flex;
   align-items: center;
   gap: 8px;
   width: 100%;
-  min-width: 150px; /* Agar tidak terlalu sempit di mobile */
+  min-width: 150px;
 }
 
 .progress-bar-track {
-  flex-grow: 1; /* Biarkan bar memanjang mengisi ruang */
+  flex-grow: 1; 
   height: 12px;
   background-color: #ecf0f1;
   border-radius: 6px;
-  overflow: hidden; /* Penting agar isinya tidak keluar dari border radius */
+  overflow: hidden; 
 }
 
 .progress-bar-fill {

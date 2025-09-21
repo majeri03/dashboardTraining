@@ -1,6 +1,6 @@
 <script setup>
 import { Line } from 'vue-chartjs'
-import Chart from 'chart.js/auto' // Otomatis register semua plugin
+import Chart from 'chart.js/auto' 
 
 defineProps({
   chartData: {
@@ -9,29 +9,28 @@ defineProps({
   },
   color: {
     type: String,
-    default: '#5356FF' // Warna default
+    default: '#5356FF' 
   }
 })
 
 const chartOptions = {
   responsive: true,
   maintainAspectRatio: false,
-  // [KUNCI] Sembunyikan semua elemen yang tidak perlu
   plugins: {
     legend: { display: false },
-    tooltip: { enabled: true } // Biarkan tooltip aktif saat di-hover
+    tooltip: { enabled: true } 
   },
   scales: {
     y: {
-      display: false, // Sembunyikan sumbu Y (angka)
+      display: false, 
     },
     x: {
-      display: false, // Sembunyikan sumbu X (bulan)
+      display: false, 
     }
   },
   elements: {
     point: {
-      radius: 0 // Sembunyikan titik di setiap data
+      radius: 0 
     }
   }
 }

@@ -1,5 +1,3 @@
-// File: src/components/LineChart.vue
-
 <script setup>
 import { Line } from 'vue-chartjs'
 import { Chart as ChartJS, Title, Tooltip, Legend, LineElement, PointElement, CategoryScale, LinearScale, Filler } from 'chart.js'

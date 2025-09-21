@@ -1,7 +1,7 @@
 <script setup>
 defineProps({
   message: String,
-  type: String, // 'success' atau 'error'
+  type: String, 
   visible: Boolean,
 });
 </script>
@@ -33,7 +33,6 @@ defineProps({
   background-color: #EF4444;
 }
 
-/* Animasi untuk muncul dan hilang */
 .slide-fade-enter-active,
 .slide-fade-leave-active {
   transition: all 0.4s ease;

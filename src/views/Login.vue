@@ -13,7 +13,6 @@ const login = async () => {
   error.value = null;
   try {
     await signInWithEmailAndPassword(auth, email.value, password.value);
-    // Jika berhasil, App.vue akan otomatis mendeteksi dan menampilkan dasbor
   } catch (err) {
     switch (err.code) {
       case 'auth/user-not-found':
@@ -83,7 +82,6 @@ const login = async () => {
   </div>
 </template>
 <style scoped>
-/* Menggunakan font dari Google Fonts untuk tampilan lebih modern */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 .login-page {
@@ -93,10 +91,8 @@ const login = async () => {
   font-family: 'Inter', sans-serif;
 }
 
-/* --- Kolom Kiri --- */
 .left-panel {
   flex: 50%;
-  /* Warna latar diubah menjadi putih bersih */
   background-color: #ffffff;
   display: flex;
   justify-content: center;
@@ -117,13 +113,12 @@ const login = async () => {
 .left-panel h1 {
   font-size: 2.5rem;
   font-weight: 700;
-  /* Warna teks utama menggunakan variabel merah */
   color: var(--primary-color, #d10000);
   margin-bottom: 1rem;
   line-height: 1.3;
 }
 .left-panel p {
-  color: #475569; /* Abu-abu gelap untuk deskripsi */
+  color: #475569; 
   font-size: 1rem;
   line-height: 1.6;
 }
@@ -132,14 +127,13 @@ const login = async () => {
   margin-top: 3rem;
 }
 
-/* --- Kolom Kanan --- */
 .right-panel {
   flex: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 2rem;
-  background-color: #f8fafc; /* Latar abu-abu sangat terang */
+  background-color: #f8fafc; 
 }
 .login-box {
   width: 100%;
@@ -160,23 +154,21 @@ const login = async () => {
   width: 100%;
   padding: 1rem;
   border: 1px solid #d1d5db;
-  border-radius: 8px; /* Border radius tegas */
+  border-radius: 8px; 
   font-size: 1rem;
-  background-color: #ffffff; /* Latar belakang input putih */
+  background-color: #ffffff; 
   transition: border-color 0.2s, box-shadow 0.2s;
   padding-left: 3rem;
    box-sizing: border-box;
 }
 .input-group input:focus {
   outline: none;
-  /* Border focus menggunakan warna biru */
   border-color: var(--secondary-color, #000a9b);
   box-shadow: 0 0 0 3px rgba(0, 10, 155, 0.15);
 }
 
 .form-options {
   display: flex;
-  /* Hanya ada satu item, jadi posisikan di akhir (kanan) */
   justify-content: flex-end;
   margin-bottom: 1.5rem;
   font-size: 0.9rem;
@@ -202,7 +194,6 @@ button {
   padding: 1rem;
   border: none;
   border-radius: 8px;
-  /* Tombol utama menggunakan warna biru */
   background-color: #00065a;
   color: rgb(255, 255, 255);
   font-size: 1rem;
@@ -211,7 +202,7 @@ button {
   transition: background-color 0.2s;
 }
 button:hover {
-  background-color: #000000; /* Biru sedikit lebih gelap */
+  background-color: #000000; 
   color:#ffffff;
 }
 button:disabled {
@@ -225,25 +216,25 @@ button:disabled {
   transform: translateY(-50%);
   width: 20px;
   height: 20px;
-  color: #9ca3af; /* Warna abu-abu netral */
-  pointer-events: none; /* Agar ikon tidak bisa diklik */
+  color: #9ca3af; 
+  pointer-events: none; 
 }
 .mobile-header {
-  display: none; /* Sembunyikan di desktop secara default */
+  display: none; 
 }
 
 @media (max-width: 768px) {
   .left-panel {
-    display: none; /* Sembunyikan panel kiri */
+    display: none;
   }
 
   .right-panel {
     flex: 100%;
-    background-color: #f3f4f6; /* Latar abu-abu terang untuk page */
+    background-color: #f3f4f6; 
     padding: 1.5rem;
-    display: flex; /* Tambahkan ini */
-    justify-content: center; /* Tambahkan ini */
-    align-items: center; /* Tambahkan ini */
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
   }
   
   .login-box {
@@ -257,7 +248,6 @@ button:disabled {
     align-items: center;
   }
 
-  /* Tampilkan dan atur gaya header mobile */
   .mobile-header {
     display: flex;
     flex-direction: column;
@@ -266,7 +256,6 @@ button:disabled {
     width: 100%;
   }
 
-  /* Sembunyikan logo desktop di mobile */
   .logo-desktop {
     display: none;
   }
@@ -277,14 +266,13 @@ button:disabled {
   }
 
   .mobile-title {
-    color: #4b5563; /* Abu-abu gelap */
+    color: #4b5563; 
     font-size: 1rem;
     font-weight: 600;
   }
 
-  /* Atur agar form di dalam kartu mengambil lebar penuh */
  .login-box form {
-  width: 100%; /* Paksa form untuk mengambil lebar penuh kontainer */
+  width: 100%; 
 }
 
   .form-title {
@@ -293,7 +281,6 @@ button:disabled {
     margin-bottom: 2rem;
   }
 
-  /* Sesuaikan warna tombol untuk mobile */
   button {
     background-color: var(--primary-color, #d10000);
   }

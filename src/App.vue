@@ -3,9 +3,8 @@ import { ref, shallowRef, onMounted, provide } from 'vue';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth } from './firebase';
 import ForgotPassword from './views/ForgotPassword.vue';
-// Import semua komponen Anda
 import Sidebar from './components/Sidebar.vue';
-import Login from './views/Login.vue'; // <-- Import halaman Login
+import Login from './views/Login.vue'; 
 import Dashboard from './views/Dashboard.vue';
 import LaporanPelaksanaan from './views/LaporanPelaksanaan.vue';
 import LaporanEvaluasi from './views/LaporanEvaluasi.vue';
@@ -15,10 +14,10 @@ import KonfigurasiDivisi from './views/KonfigurasiDivisi.vue';
 import KonfigurasiBulanan from './views/KonfigurasiBulanan.vue';
 import Notification from './components/Notification.vue';
 import GoogleFormLink from './views/GoogleFormLink.vue';
-// State untuk melacak pengguna yang login
+
 const user = ref(null);
-const isAuthReady = ref(false); // Untuk mencegah flicker
-const authView = ref('login'); // 'login' atau 'forgotPassword'
+const isAuthReady = ref(false); 
+const authView = ref('login'); 
 const authViews = {
   login: Login,
   forgotPassword: ForgotPassword
@@ -47,12 +46,10 @@ const toggleSidebar = () => {
   isSidebarOpen.value = !isSidebarOpen.value;
 };
 
-// Fungsi Logout
 const logout = async () => {
   await signOut(auth);
 };
 
-// Cek status login saat aplikasi dimuat
 onMounted(() => {
   onAuthStateChanged(auth, (firebaseUser) => {
     user.value = firebaseUser;
@@ -60,11 +57,9 @@ onMounted(() => {
   });
 });
 
-// Sediakan 'user' dan 'logout' untuk komponen anak (seperti Sidebar)
 provide('user', user);
 provide('logout', logout);
 
-// --- Logika Notifikasi (dari sebelumnya) ---
 const notification = ref({ message: '', type: '', visible: false });
 let notificationTimer = null;
 const showNotification = (message, type = 'success') => {
@@ -113,11 +108,10 @@ provide('showNotification', showNotification);
 </template>
 
 <style>
-/* Style global Anda tidak berubah */
 :root {
   --primary-color: #d10000;
   --secondary-color: #000a9bffff;
-  --sidebar-bg:rgb(5, 39, 114); /* Warna sidebar baru yang lebih gelap */
+  --sidebar-bg:rgb(5, 39, 114); 
   --sidebar-text: #ffffff;
   --sidebar-text-hover: #FFFFFF;
   --sidebar-active-bg: #ff6464;
@@ -140,14 +134,12 @@ body {
   overflow-y: auto;
 }
 
-/* Style umum untuk Card dan Tabel yang bisa digunakan di semua view */
 .card {
   background-color: #ffffff;
-  border-radius: 12px; /* Sedikit lebih bulat */
+  border-radius: 12px; 
   padding: 1.5rem;
-  /* Bayangan yang lebih lembut dan modern */
   box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  border: 1px solid var(--border-color); /* Border lembut sebagai tambahan */
+  border: 1px solid var(--border-color);
 }
 .card-title { margin-top: 0; }
 .table-wrapper { overflow-x: auto; }

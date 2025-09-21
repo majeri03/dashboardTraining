@@ -11,7 +11,6 @@ const navigateTo = (view) => {
   emit('navigate', view);
 };
 
-// [BARU] Daftar menu dalam bentuk array objek agar lebih rapi
 const menuItems = [
   {
     name: 'Dashboard',
@@ -144,8 +143,8 @@ const logout = inject('logout');
   align-items: center;
   gap: 0.75rem;
   border-bottom: 1px solid var(--border-color, #e5e7eb);
-  background-color: #ffffff; /* <-- TAMBAHKAN INI */
-  padding: 1.5rem;            /* <-- UBAH INI */
+  background-color: #ffffff; 
+  padding: 1.5rem;           
 }
 
 .logo {
@@ -154,7 +153,7 @@ const logout = inject('logout');
 }
 
 .logo-title {
-  color: #111827; /* <-- UBAH WARNA TEKS JADI GELAP */
+  color: #111827;
   margin: 0;
   font-size: 1.25rem;
   font-weight: 600;
@@ -194,7 +193,6 @@ const logout = inject('logout');
   box-shadow: 0 0 8px rgba(255, 59, 59, 0.7), 0 0 12px rgba(255, 59, 59, 0.5);
 }
 
-/* Mengatur style ikon SVG */
 .nav-icon {
   width: 24px;
   height: 24px;
@@ -206,11 +204,11 @@ const logout = inject('logout');
 }
 
 .sidebar-header {
-  position: relative; /* Diperlukan untuk posisi tombol close */
+  position: relative; 
 }
 
 .close-menu {
-  display: none; /* Sembunyi di desktop */
+  display: none;
   position: absolute;
   top: 10px;
   right: 10px;
@@ -232,23 +230,23 @@ const logout = inject('logout');
 }
 
 .nav-link {
-  position: relative; /* Diperlukan agar panah dropdown pas posisinya */
+  position: relative; 
 }
 
 .dropdown-arrow {
   position: absolute;
   right: 1rem;
-  transition: transform 0.2s; /* Animasi putar */
+  transition: transform 0.2s; 
 }
 
 .dropdown-arrow.is-open {
-  transform: rotate(180deg); /* Putar 180 derajat saat terbuka */
+  transform: rotate(180deg); 
 }
 
 .submenu {
   display: flex;
   flex-direction: column;
-  padding-left: 3.25rem; /* Beri jarak kiri agar menjorok ke dalam */
+  padding-left: 3.25rem;
   border-radius: 6px;
   margin-top: 0.25rem;
 }
@@ -260,10 +258,9 @@ const logout = inject('logout');
   border-radius: 6px;
   font-size: 0.9em;
 
-  /* --- TAMBAHAN BARU --- */
   display: flex;
   align-items: center;
-  gap: 0.75rem; /* Jarak antara ikon dan teks */
+  gap: 0.75rem; 
 }
 
 .submenu-link:hover {
@@ -277,7 +274,7 @@ const logout = inject('logout');
 }
 
 .sidebar-footer {
-  margin-top: auto; /* Mendorong ke bagian bawah */
+  margin-top: auto; 
   padding: 1rem;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
@@ -331,9 +328,9 @@ const logout = inject('logout');
   height: 20px;
 }
 .submenu-icon {
-  width: 20px; /* Ukuran ikon */
+  width: 20px; 
   height: 20px;
-  flex-shrink: 0; /* Mencegah ikon menyusut */
-  color: currentColor; /* Warna ikon mengikuti warna teks */
+  flex-shrink: 0; 
+  color: currentColor; 
 }
 </style>

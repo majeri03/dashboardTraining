@@ -5,9 +5,9 @@ defineProps({
   unit: String,
   color: {
     type: String,
-    default: '#374151' // Ganti default menjadi warna teks
+    default: '#374151' 
   },
-  icon: String // Prop baru untuk SVG ikon
+  icon: String 
 })
 </script>
 

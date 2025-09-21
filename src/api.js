@@ -4,7 +4,7 @@ const apiUrl = import.meta.env.VITE_API_URL;
 const apiClient = {
   /**
    * Fungsi untuk mengirim request POST.
-   * @param {string} url - URL endpoint (bisa dikosongkan).
+   * @param {string} url - URL endpoint 
    * @param {object} data - Payload atau data yang akan dikirim.
    * @returns {Promise<object>} - Hasil respons dari server.
    */

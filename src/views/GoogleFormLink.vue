@@ -1,18 +1,12 @@
 <script setup>
 import { ref, inject } from 'vue';
 
-// --- KONFIGURASI PENTING ---
-// Karena keduanya tidak bisa di-embed, kita hanya butuh URL untuk dibagikan.
-
-// 1. Formulir Evaluasi (Publik)
 const evaluasiShareUrl = ref('https://forms.gle/okCzMCPcazj4TVSX8');
 
-// 2. Formulir Internal Pelaksanaan (Panitia)
 const internalShareUrl = ref('https://forms.gle/FzQYu9i9JNVzacfx8');
 
 const showNotification = inject('showNotification');
 
-// Fungsi generik untuk menyalin link
 const copyToClipboard = (url, formName) => {
   if (!url || url.startsWith('GANTI_DENGAN')) {
     showNotification('URL belum diatur di dalam kode!', 'error');
@@ -25,7 +19,6 @@ const copyToClipboard = (url, formName) => {
   });
 };
 
-// Fungsi generik untuk berbagi
 const shareLink = async (url, formName, description) => {
   if (!url || url.startsWith('GANTI_DENGAN')) {
     showNotification('URL belum diatur di dalam kode!', 'error');
@@ -159,8 +152,8 @@ const shareLink = async (url, formName, description) => {
   border: 1px solid #e2e8f0;
   border-radius: 8px;
   padding: 2rem;
-  flex-grow: 1; /* Membuat placeholder mengisi ruang tersedia */
-  min-height: 400px; /* Memberi tinggi minimal */
+  flex-grow: 1; 
+  min-height: 400px; 
 }
 .no-embed-placeholder .icon svg {
   width: 48px;

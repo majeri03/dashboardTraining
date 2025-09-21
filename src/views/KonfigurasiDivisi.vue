@@ -5,16 +5,14 @@ import axios from 'axios';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 const showNotification = inject('showNotification');
-// State untuk data utama
 const configDivisi = ref([]);
 const isLoading = ref(true);
 const error = ref(null);
 
-// State untuk modal/form
 const isModalOpen = ref(false);
-const modalMode = ref('add'); // 'add' atau 'edit'
+const modalMode = ref('add'); 
 const currentItem = ref({ divisi: '', jumlahkaryawan: 0 });
-const originalDivisiName = ref(''); // Untuk melacak nama asli saat edit
+const originalDivisiName = ref(''); 
 const modalError = ref('');
 const isSubmitting = ref(false);
 
@@ -34,7 +32,6 @@ const fetchData = async () => {
 
 onMounted(fetchData);
 
-// --- FUNGSI-FUNGSI UNTUK MODAL ---
 const openModalForAdd = () => {
   modalMode.value = 'add';
   currentItem.value = { divisi: '', jumlahkaryawan: 0 };
@@ -44,8 +41,8 @@ const openModalForAdd = () => {
 
 const openModalForEdit = (item) => {
   modalMode.value = 'edit';
-  currentItem.value = { ...item }; // Salin item agar tidak mengubah data asli langsung
-  originalDivisiName.value = item.divisi; // Simpan nama asli
+  currentItem.value = { ...item };
+  originalDivisiName.value = item.divisi;
   modalError.value = '';
   isModalOpen.value = true;
 };
@@ -56,7 +53,6 @@ const closeModal = () => {
 
 // --- FUNGSI-FUNGSI UNTUK CRUD ---
 const handleSubmit = async () => {
-  // Validasi (tidak ada perubahan)
   if (!currentItem.value.divisi.trim()) {
     modalError.value = "Nama Divisi tidak boleh kosong.";
     return;
@@ -80,23 +76,16 @@ const handleSubmit = async () => {
       };
     }
     
-    // Kirim data ke server. Kita tidak menggunakan 'await' karena kita tahu responsnya akan diblokir.
     apiClient.post('', payload);
 
-    // ===================================================================
-    // INI ADALAH LOGIKA YANG BENAR
-    // ===================================================================
-    // Karena kita tahu data berhasil terkirim, kita beri jeda 1.5 detik
-    // untuk memberi waktu server memproses, lalu kita anggap berhasil di sisi tampilan.
     setTimeout(() => {
-      fetchData(); // Ambil data terbaru dari Google Sheet
+      fetchData();
       closeModal();
       showNotification(modalMode.value === 'add' ? 'Divisi berhasil ditambahkan!' : 'Divisi berhasil diperbarui!', 'success');
       isSubmitting.value = false;
-    }, 1500); // 1.5 detik
+    }, 1500); 
 
   } catch (err) {
-    // Blok catch ini hanya akan berjalan jika ada error sebelum data dikirim (sangat jarang)
     showNotification("Terjadi kesalahan yang tidak terduga saat mengirim data.", 'error');
     isSubmitting.value = false;
   }
@@ -107,17 +96,12 @@ const deleteItem = async (item) => {
     try {
       const payload = { action: 'deleteDivisi', payload: { divisi: item.divisi } };
       
-      // Kirim permintaan hapus tanpa menunggu respons
       apiClient.post('', payload);
 
-      // ===================================================================
-      // LOGIKA YANG BENAR UNTUK HAPUS
-      // ===================================================================
-      // Anggap berhasil setelah jeda singkat
       setTimeout(() => {
-        fetchData(); // Refresh data dari Google Sheet
+        fetchData(); 
         showNotification(`Divisi "${item.divisi}" berhasil dihapus.`, 'success');
-      }, 1500); // 1.5 detik
+      }, 1500); 
 
     } catch (err) {
       showNotification("Gagal menghapus: " + err.message, 'error');
@@ -191,7 +175,6 @@ const deleteItem = async (item) => {
 </template>
 
 <style scoped>
-/* Semua style sama seperti sebelumnya, salin saja dari kode yang saya berikan di respons terakhir */
 .card { background-color: #ffffff; border-radius: 8px; padding: 1.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
 .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
 .card-title { margin: 0; }
@@ -203,7 +186,6 @@ const deleteItem = async (item) => {
 .btn-delete { background-color: #EF4444; }
 .loading-state, .error-state, .empty-state { text-align: center; padding: 2rem; font-size: 1.1rem; color: #777; }
 .error-state { color: #d32f2f; font-weight: bold; }
-/* Style untuk Modal */
 .modal-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;

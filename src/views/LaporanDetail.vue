@@ -26,7 +26,6 @@ const totalPesertaBulanan = computed(() => {
 
 const totalDurasiBulanan = computed(() => {
   if (!reportData.value?.trainings) return 0;
-  // Menjumlahkan durasi dari setiap training, bukan total jam training
   return reportData.value.trainings.reduce((total, training) => total + Number(training.durasi), 0);
 });
 
@@ -50,7 +49,6 @@ const fetchData = async () => {
     const params = { action: 'detailRekap', month: selectedMonth.value, year: selectedYear.value };
     const response = await axios.get(apiUrl, { params });
     
-    // Pengecekan jika Apps Script mengirimkan status error di dalam data
     if (response.data.status === 'ERROR') {
       throw new Error(response.data.message);
     }
@@ -59,7 +57,7 @@ const fetchData = async () => {
   } catch (err) {
     error.value = "Gagal memuat data: " + (err.message || "Silakan cek koneksi atau hubungi administrator.");
     console.error("Detail Error:", err);
-    reportData.value = null; // Pastikan data kosong jika terjadi error
+    reportData.value = null; 
   } finally {
     isLoading.value = false;
   }
@@ -71,7 +69,6 @@ onMounted(async () => {
     divisiHeaders.value = response.data;
   } catch (err) {
     console.error("Gagal memuat daftar divisi:", err);
-    // Sediakan daftar cadangan jika API gagal
     divisiHeaders.value = [ 'IT', 'Marketing', 'Operasional', 'HR & GA', 'Finance & Accounting', 'Procurement', 'Sales', 'Customer Service', 'Legal & Compliance', 'HSE (K3)'];
   }
   await fetchData();
@@ -85,12 +82,10 @@ const getDivisiInfo = (rincian, div) => {
     return `${data.peserta} / ${data.jam.toFixed(1)}`;
 };
 
-// Tambahkan dua fungsi baru ini di dalam <script setup>
 
 const exportToExcel = () => {
   const dataToExport = [];
   
-  // 1. Buat Header (Bagian ini sudah benar)
   const mainHeader = ['No', 'Nama Kegiatan', 'Jadwal', 'Tipe', 'PIC/Pemateri', 'Jml Peserta', 'Durasi (Jam)', 'Total Jam Training'];
   divisiHeaders.value.forEach(div => {
     mainHeader.push(div, '');
@@ -105,9 +100,7 @@ const exportToExcel = () => {
 
   dataToExport.push(mainHeader, subHeader);
 
-  // 2. Buat Body (Data Training)
-  // =======================================================
-  // AWAL LOOP DATA TRAINING
+
   reportData.value.trainings.forEach((training, index) => {
     const row = [
       index + 1,
@@ -126,17 +119,11 @@ const exportToExcel = () => {
     row.push(training.totalJamTraining.toFixed(1));
     dataToExport.push(row);
   });
-  // AKHIR LOOP DATA TRAINING
-  // =======================================================
-
-
-  // 3. --- BAGIAN SUMMARY (HANYA DIJALANKAN SEKALI SETELAH LOOP SELESAI) ---
+ 
   if (reportData.value && reportData.value.trainings.length > 0) {
-    // Baris kosong sebagai pemisah
     dataToExport.push([]); 
 
-    // Baris Total Bulanan
-    const totalRow = ['Total bulanan', '', '', '', '']; // 5 sel pertama
+    const totalRow = ['Total bulanan', '', '', '', '']; 
     totalRow.push(
         totalPesertaBulanan.value,
         totalDurasiBulanan.value,
@@ -151,7 +138,6 @@ const exportToExcel = () => {
     totalRow.push(reportData.value.summary.totalJamBulanan.toFixed(1));
     dataToExport.push(totalRow);
     
-    // Baris Summary Lainnya
     const totalColumns = mainHeader.length;
     const summaryColSpan = 7;
     
@@ -171,13 +157,10 @@ const exportToExcel = () => {
     acvRow[summaryColSpan] = reportData.value.summary.pencapaian;
     dataToExport.push(acvRow);
   }
-  // --- AKHIR BAGIAN SUMMARY ---
 
 
-  // 4. Buat Workbook dan Worksheet
   const ws = XLSX.utils.aoa_to_sheet(dataToExport);
   
-  // Atur merge cells untuk header dan footer
   ws['!merges'] = [];
   let col = 8;
   divisiHeaders.value.forEach(() => {
@@ -196,7 +179,6 @@ const exportToExcel = () => {
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Laporan Detail');
 
-  // 5. Trigger Download
   XLSX.writeFile(wb, `Laporan_Detail_${selectedMonth.value}_${selectedYear.value}.xlsx`);
 };
 
@@ -211,7 +193,6 @@ const exportToPDF = () => {
     const monthName = months.value.find(m => m.value === selectedMonth.value)?.name || 'Bulan';
     doc.text(`Laporan Detail Bulanan - ${monthName} ${selectedYear.value}`, 14, 15);
 
-    // 1. Definisikan Header dengan hati-hati
     const head = [];
     const headerRow1 = [
       { content: 'No', rowSpan: 2 }, { content: 'Nama Kegiatan', rowSpan: 2 },
@@ -230,7 +211,6 @@ const exportToPDF = () => {
     });
     head.push(headerRow1, headerRow2);
 
-    // 2. Definisikan Body (Data Training)
     const body = reportData.value.trainings.map((training, index) => {
       const row = [
         index + 1, training.judul, training.jadwal, training.extInt, training.pemateri,
@@ -244,7 +224,6 @@ const exportToPDF = () => {
       return row;
     });
     
-    // 3. Definisikan Footer
     const foot = [];
     const footerRow1 = [{ content: 'Total bulanan', colSpan: 5, styles: { halign: 'right', fontStyle: 'bold' } }];
     footerRow1.push(
@@ -266,7 +245,6 @@ const exportToPDF = () => {
     const footerRow4 = [{ content: 'Acv (%)', colSpan: 7, styles: { halign: 'right' } }, { content: reportData.value.summary.pencapaian.toString(), styles: { fontStyle: 'bold' } }];
     foot.push(footerRow1, footerRow2, footerRow3, footerRow4);
 
-    // 4. Buat Tabel
     autoTable(doc, {
       head: head,
       body: body,
@@ -277,19 +255,16 @@ const exportToPDF = () => {
       headStyles: { fillColor: [41, 128, 185], valign: 'middle', fontSize: 7 },
       footStyles: { fillColor: [236, 240, 241], textColor: [44, 62, 80] },
       didParseCell: function(data) {
-        // Atur agar kolom nama kegiatan rata kiri
         if (data.column.index === 1 && data.section !== 'head') {
           data.cell.styles.halign = 'left';
         }
       }
     });
 
-    // 5. Trigger Download
     doc.save(`Laporan_Detail_${selectedMonth.value}_${selectedYear.value}.pdf`);
 
   } catch (err) {
     console.error("Gagal membuat PDF:", err);
-    // Panggil notifikasi eror global yang sudah kita buat
     showNotification("Gagal membuat PDF. Cek console untuk detail.", 'error');
   }
 };

@@ -2,11 +2,8 @@
 import { ref, onMounted, computed } from 'vue';
 import axios from 'axios';
 
-// PASTE URL WEB APP ANDA DARI HASIL DEPLOY TERAKHIR
 const apiUrl = import.meta.env.VITE_API_URL;
 
-// --- [FINAL] KONFIGURASI TABEL YANG AKURAT ---
-// Key di sini sudah dicocokkan dengan header asli Anda setelah dibersihkan oleh Apps Script
 const tableHeaders = ref([
     { key: 'judulTraining', label: 'Judul Training', sortable: true },
     { key: 'kompetensiYangDilatih', label: 'Kompetensi', sortable: false },
@@ -18,21 +15,17 @@ const tableHeaders = ref([
     { key: 'timestamp', label: 'Waktu Lapor', sortable: true },
 ]);
 
-// --- STATE MANAGEMENT ---
 const allData = ref([]);
 const isLoading = ref(false);
 const error = ref(null);
 
-// --- STATE UNTUK FILTER & SORT ---
 const searchQuery = ref('');
 const sortKey = ref('timestamp');
 const sortOrder = ref('desc');
 
-// --- STATE UNTUK PAGINATION ---
 const currentPage = ref(1);
 const itemsPerPage = ref(10);
 
-// --- COMPUTED PROPERTIES ---
 const filteredData = computed(() => {
   if (!searchQuery.value) return allData.value;
   const lowerCaseQuery = searchQuery.value.toLowerCase();
@@ -66,7 +59,6 @@ const paginatedData = computed(() => {
   return sortedData.value.slice(start, end);
 });
 
-// --- METHODS ---
 const fetchData = async (force = false) => {
   if (allData.value.length > 0 && !force) {
     return;
@@ -178,7 +170,7 @@ th.sorted { color: var(--secondary-color, #f36f21); }
   flex-wrap: wrap;
 }
 .search-input {
-  flex-grow: 1; /* Biarkan search input memanjang */
+  flex-grow: 1; 
 }
 .btn-refresh {
   padding: 0.75rem 1.5rem;
@@ -193,7 +185,6 @@ th.sorted { color: var(--secondary-color, #f36f21); }
   background-color: #f0f0f0;
 }
 
-/* [BARU] Style untuk Pagination */
 .pagination-controls {
   display: flex;
   justify-content: center;
