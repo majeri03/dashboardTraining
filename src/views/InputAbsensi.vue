@@ -354,6 +354,7 @@ select, input[type="number"] {
   background-color: #f9fafb;
   padding: 1rem;
   border-radius: 8px;
+  flex-wrap: wrap;
 }
 .filter-group label { margin-bottom: 0; }
 .filter-group select { width: auto; flex-grow: 1; }

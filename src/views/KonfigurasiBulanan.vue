@@ -35,6 +35,14 @@ const years = computed(() => {
 });
 const months = ref(['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember']);
 
+const isDuplicateEntry = computed(() => {
+  if (modalMode.value !== 'add') return false;
+
+  return configBulanan.value.some(item => 
+    item.tahun == currentItem.value.tahun && item.bulan == currentItem.value.bulan
+  );
+});
+
 const fetchData = async () => {
   isLoading.value = true;
   error.value = null;
@@ -70,7 +78,6 @@ const closeModal = () => {
 };
 
 const handleSubmit = async () => {
-  // Validasi (tidak ada perubahan)
   if (currentItem.value.jumlahkaryawan <= 0 || currentItem.value.targetperorang <= 0) {
     modalError.value = "Jumlah dan Target harus lebih dari 0.";
     return;
@@ -94,21 +101,17 @@ const handleSubmit = async () => {
       };
     }
 
-    // Kirim data tanpa menunggu respons ('await' dihilangkan)
     apiClient.post('', payload);
 
-    // ===================================================================
-    // LOGIKA BARU: Anggap berhasil setelah jeda 1.5 detik
-    // ===================================================================
+
     setTimeout(() => {
-      fetchData(); // Refresh data dari Google Sheet
+      fetchData();
       closeModal();
       showNotification(modalMode.value === 'add' ? 'Konfigurasi berhasil ditambahkan!' : 'Konfigurasi berhasil diperbarui!', 'success');
       isSubmitting.value = false;
     }, 1500);
 
   } catch (err) {
-    // Blok ini hanya untuk menangkap error jika pengiriman awal gagal
     showNotification("Terjadi kesalahan saat mengirim data.", 'error');
     isSubmitting.value = false;
   }
@@ -119,14 +122,10 @@ const deleteItem = async (item) => {
     try {
       const payload = { action: 'deleteBulanan', payload: { tahun: item.tahun, bulan: item.bulan } };
 
-      // Kirim permintaan hapus tanpa menunggu respons
       apiClient.post('', payload);
 
-      // ===================================================================
-      // LOGIKA BARU: Anggap berhasil setelah jeda 1.5 detik
-      // ===================================================================
       setTimeout(() => {
-        fetchData(); // Refresh data
+        fetchData(); 
         showNotification(`Konfigurasi untuk ${item.bulan} ${item.tahun} berhasil dihapus.`, 'success');
       }, 1500);
 
@@ -220,13 +219,15 @@ const deleteItem = async (item) => {
             <label for="target">Target per Orang (Jam)</label>
             <input type="number" id="target" v-model.number="currentItem.targetperorang" required min="1" step="0.1">
           </div>
-
+          <div v-if="isDuplicateEntry" class="feedback error">
+            Konfigurasi untuk periode ini sudah ada. Silakan pilih tahun atau bulan yang lain.
+        </div>
           <div v-if="modalError" class="feedback error">{{ modalError }}</div>
 
           <div class="modal-actions">
             <button type="button" class="btn-cancel" @click="closeModal">Batal</button>
-            <button type="submit" class="btn-save" :disabled="isSubmitting">
-              {{ isSubmitting ? 'Menyimpan...' : 'Simpan' }}
+            <button type="submit" class="btn-save" :disabled="isSubmitting || isDuplicateEntry">
+              {{ isSubmitting ? 'Menyimpan...' : (isDuplicateEntry ? 'Periode Sudah Ada' : 'Simpan') }}
             </button>
           </div>
         </form>

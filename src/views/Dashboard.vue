@@ -363,7 +363,7 @@ const iconPencapaian = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" view
 .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
 .section { margin-top: 3rem; }
 .section-title { font-size: 1.5rem; color: var(--text-color); margin-bottom: 1.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color); }
-.dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 1.5rem; }
+.dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; }
 .card { display: flex; flex-direction: column; background-color: #fff; border-radius: 12px; padding: 1.5rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); border: 1px solid var(--border-color, #e5e7eb); }
 .card-title { font-size: 1.1rem; font-weight: 600; margin-top: 0; margin-bottom: 1.5rem; }
 .chart-container { position: relative; height: 300px; flex-grow: 1; }
@@ -398,7 +398,9 @@ const iconPencapaian = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" view
 .insight-total.blue { color: #3B82F6; }
 
 .sparkline-container {
-  height: 80px;
+  position: relative; 
+  width: 100%;     
+  height: 80px;  
 }
 
 .kpi-container {
@@ -416,8 +418,9 @@ const iconPencapaian = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" view
 
 .daily-trends-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 1.5rem;
+  margin-right: 2px;
 }
 .header {
   display: flex;
