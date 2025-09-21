@@ -1,24 +1,37 @@
-import axios from 'axios';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
-const apiClient = axios.create({
-  baseURL: apiUrl, 
-});
+const apiClient = {
+  /**
+   * Fungsi untuk mengirim request POST.
+   * @param {string} url - URL endpoint (bisa dikosongkan).
+   * @param {object} data - Payload atau data yang akan dikirim.
+   * @returns {Promise<object>} - Hasil respons dari server.
+   */
+  post: async (url, data) => {
+    try {
+      const fullUrl = `${apiUrl}${url}`;
+      
+      const response = await fetch(fullUrl, {
+        method: 'POST',
+        redirect: 'follow', 
+        headers: {
+          'Content-Type': 'text/plain;charset=utf-8',
+        },
+        body: JSON.stringify(data),
+      });
 
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
-apiClient.interceptors.request.use(
-  (config) => {
-    if (config.method === 'post') {
-      config.headers['Content-Type'] = 'text/plain;charset=utf-8';
-      config.adapter = 'xhr';
-      config.data = JSON.stringify(config.data);
+      return { data: await response.json() };
+
+    } catch (error) {
+      console.error('API Client Error:', error);
+      throw error;
     }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
   }
-);
+};
 
 export default apiClient;
