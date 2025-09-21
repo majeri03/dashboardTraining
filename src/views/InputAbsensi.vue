@@ -218,6 +218,12 @@ onMounted(() => {
 });
 
 watch([selectedMonth, selectedYear], fetchTrainings);
+
+watch([isDataModalOpen, isEditModalOpen], ([dataOpen, editOpen]) => {
+  const anyOpen = dataOpen || editOpen;
+  document.body.classList.toggle('no-scroll', anyOpen);
+});
+
 </script>
 
 <template>
@@ -406,8 +412,8 @@ button:disabled { background-color: #ff8a8a; cursor: not-allowed; }
 }
 .card-header { display: flex; justify-content: space-between; align-items: center; }
 .btn-secondary { background-color: #6c757d; color: white; padding: 0.5rem 1rem; border: none; border-radius: 6px; cursor: pointer; }
-.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 1000; }
-.modal-content { background-color: white; padding: 2rem; border-radius: 8px; width: 90%; max-width: 500px; }
+.modal-overlay { position: fixed; inset: 0;  background-color: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; padding: 1rem;  z-index: 1000; }
+.modal-content { background-color: white; padding: 1.25rem; border-radius: 10px; width: 90%; max-width: 500px; max-height: calc(100vh - 2rem);overflow: auto; overflow: auto; overscroll-behavior: contain; }
 .modal-lg { max-width: 900px; }
 .modal-title { margin-top: 0; }
 .modal-actions { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1.5rem; }
@@ -419,4 +425,9 @@ button:disabled { background-color: #ff8a8a; cursor: not-allowed; }
 .table-wrapper { max-height: 60vh; overflow: auto; }
 .action-buttons { display: flex; gap: 0.5rem; }
 .loading-state, .empty-state { text-align: center; padding: 2rem; color: #6b7280; }
+@media (max-width: 640px){
+  .modal-content{ padding: 1rem; border-radius: 8px; }
+  
+}
+.no-scroll{ overflow: hidden; }
 </style>
