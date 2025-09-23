@@ -14,7 +14,7 @@ import KonfigurasiDivisi from './views/KonfigurasiDivisi.vue';
 import KonfigurasiBulanan from './views/KonfigurasiBulanan.vue';
 import Notification from './components/Notification.vue';
 import GoogleFormLink from './views/GoogleFormLink.vue';
-
+import LaporanTahunan from './views/LaporanTahunan.vue';
 const user = ref(null);
 const isAuthReady = ref(false); 
 const authView = ref('login'); 
@@ -27,6 +27,7 @@ const views = {
   LaporanPelaksanaan,
   LaporanEvaluasi,
   LaporanDetail,
+  LaporanTahunan,
   InputAbsensi,
   KonfigurasiDivisi,
   KonfigurasiBulanan,

@@ -11,6 +11,7 @@ const tableHeaders = ref([
   { key: 'judulTraining', label: 'Judul Training', sortable: true, isRating: false },
   { key: 'kompetensiYangDilatih', label: 'Kompetensi', sortable: false, isRating: false },
   { key: 'garisBesarTraining', label: 'Garis Besar', sortable: false, isRating: false },
+  { key: 'penyelenggara', label: 'Penyelenggara', sortable: true, isRating: false },
   { key: 'namaPemateriInstruktur', label: 'Pemateri', sortable: true, isRating: false },
   { key: 'tanggalPelaksanaan', label: 'Tanggal', sortable: true, isRating: false },
   { key: 'durasiPelaksanaansatuanJam', label: 'Durasi (Jam)', sortable: true, isRating: false },

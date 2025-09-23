@@ -10,34 +10,43 @@ const error = ref(null);
 
 const isModalOpen = ref(false);
 const modalMode = ref('add');
-const currentItem = ref({ tahun: new Date().getFullYear(), bulan: '', jumlahkaryawan: 0, targetperorang: 0 });
+const currentItem = ref({ tahun: new Date().getFullYear(), bulan: 'Januari', jumlahkaryawan: 0, targetperorang: 0 });
 const originalItem = ref(null); 
 const modalError = ref('');
 const isSubmitting = ref(false);
 
-const selectedYear = ref('');
+const selectedYear = ref(new Date().getFullYear());
 
 const availableYears = computed(() => {
-  const years = configBulanan.value.map(item => item.tahun);
-  return [...new Set(years)].sort((a, b) => b - a); 
+  const yearsInDb = configBulanan.value.map(item => item.tahun);
+  const currentYear = new Date().getFullYear();
+  const allPossibleYears = [...new Set([currentYear, currentYear + 1, ...yearsInDb])];
+  return allPossibleYears.sort((a, b) => b - a);
 });
 
 const filteredData = computed(() => {
   if (!selectedYear.value) {
     return []; 
   }
-  return configBulanan.value.filter(item => item.tahun == selectedYear.value);
+  const monthOrder = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+  return configBulanan.value
+    .filter(item => item.tahun == selectedYear.value)
+    .sort((a, b) => monthOrder.indexOf(a.bulan) - monthOrder.indexOf(b.bulan));
 });
 
-const years = computed(() => {
+const yearsForForm = computed(() => {
+  const yearsInDb = configBulanan.value.map(item => item.tahun);
   const currentYear = new Date().getFullYear();
-  return [currentYear - 1, currentYear, currentYear + 1, currentYear + 2, currentYear + 3, currentYear + 4, currentYear + 5];
+  // Ambil semua tahun unik, tambahkan 5 tahun ke depan, lalu urutkan
+  const futureYears = [1, 2, 3, 4, 5].map(i => currentYear + i);
+  const allYears = [...new Set([currentYear, ...yearsInDb, ...futureYears])];
+  return allYears.sort((a, b) => a - b);
 });
+
 const months = ref(['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember']);
 
 const isDuplicateEntry = computed(() => {
   if (modalMode.value !== 'add') return false;
-
   return configBulanan.value.some(item => 
     item.tahun == currentItem.value.tahun && item.bulan == currentItem.value.bulan
   );
@@ -58,9 +67,32 @@ const fetchData = async () => {
 
 onMounted(fetchData);
 
+// FUNGSI BARU YANG CERDAS
 const openModalForAdd = () => {
   modalMode.value = 'add';
-  currentItem.value = { tahun: new Date().getFullYear(), bulan: 'Januari', jumlahkaryawan: 0, targetperorang: 0 };
+  
+  // Urutkan semua konfigurasi dari yang terbaru ke terlama
+  const sortedConfigs = [...configBulanan.value].sort((a, b) => {
+    const dateA = new Date(`${a.bulan} 1, ${a.tahun}`);
+    const dateB = new Date(`${b.bulan} 1, ${b.tahun}`);
+    return dateB - dateA;
+  });
+
+  const lastConfig = sortedConfigs[0]; // Ambil data terakhir
+
+  if (lastConfig) {
+    // Jika ada data terakhir, gunakan nilainya sebagai default
+    currentItem.value = { 
+      tahun: new Date().getFullYear(), 
+      bulan: 'Januari', 
+      jumlahkaryawan: lastConfig.jumlahkaryawan, 
+      targetperorang: lastConfig.targetperorang 
+    };
+  } else {
+    // Jika tidak ada data sama sekali, gunakan nilai awal
+    currentItem.value = { tahun: new Date().getFullYear(), bulan: 'Januari', jumlahkaryawan: 0, targetperorang: 0 };
+  }
+  
   modalError.value = '';
   isModalOpen.value = true;
 };
@@ -78,8 +110,8 @@ const closeModal = () => {
 };
 
 const handleSubmit = async () => {
-  if (currentItem.value.jumlahkaryawan <= 0 || currentItem.value.targetperorang <= 0) {
-    modalError.value = "Jumlah dan Target harus lebih dari 0.";
+  if (currentItem.value.jumlahkaryawan <= 0 || currentItem.value.targetperorang < 0) {
+    modalError.value = "Jumlah Karyawan harus > 0 dan Target tidak boleh negatif.";
     return;
   }
 
@@ -103,7 +135,6 @@ const handleSubmit = async () => {
 
     apiClient.post('', payload);
 
-
     setTimeout(() => {
       fetchData();
       closeModal();
@@ -121,14 +152,11 @@ const deleteItem = async (item) => {
   if (confirm(`Yakin hapus konfigurasi untuk ${item.bulan} ${item.tahun}?`)) {
     try {
       const payload = { action: 'deleteBulanan', payload: { tahun: item.tahun, bulan: item.bulan } };
-
       apiClient.post('', payload);
-
       setTimeout(() => {
         fetchData(); 
         showNotification(`Konfigurasi untuk ${item.bulan} ${item.tahun} berhasil dihapus.`, 'success');
       }, 1500);
-
     } catch (err) {
       showNotification("Gagal menghapus: " + err.message, 'error');
     }
@@ -195,13 +223,13 @@ const deleteItem = async (item) => {
     <div v-if="isModalOpen" class="modal-overlay" @click.self="closeModal">
       <div class="modal-content">
         <h3 class="modal-title">{{ modalMode === 'add' ? 'Tambah Periode Baru' : 'Edit Periode' }}</h3>
-
+        <p v-if="modalMode === 'add'" class="modal-subtitle">Nilai default diisi dari konfigurasi terakhir yang ada.</p>
         <form @submit.prevent="handleSubmit">
           <div class="form-grid">
             <div class="form-group">
               <label for="tahun">Tahun</label>
               <select id="tahun" v-model="currentItem.tahun">
-                <option v-for="year in years" :key="year" :value="year">{{ year }}</option>
+                <option v-for="year in yearsForForm" :key="year" :value="year">{{ year }}</option>
               </select>
             </div>
             <div class="form-group">
@@ -217,17 +245,16 @@ const deleteItem = async (item) => {
           </div>
           <div class="form-group">
             <label for="target">Target per Orang (Jam)</label>
-            <input type="number" id="target" v-model.number="currentItem.targetperorang" required min="1" step="0.1">
+            <input type="number" id="target" v-model.number="currentItem.targetperorang" required min="0" step="0.1">
           </div>
           <div v-if="isDuplicateEntry" class="feedback error">
             Konfigurasi untuk periode ini sudah ada. Silakan pilih tahun atau bulan yang lain.
-        </div>
+          </div>
           <div v-if="modalError" class="feedback error">{{ modalError }}</div>
-
           <div class="modal-actions">
             <button type="button" class="btn-cancel" @click="closeModal">Batal</button>
-            <button type="submit" class="btn-save" :disabled="isSubmitting || isDuplicateEntry">
-              {{ isSubmitting ? 'Menyimpan...' : (isDuplicateEntry ? 'Periode Sudah Ada' : 'Simpan') }}
+            <button type="submit" class="btn-save" :disabled="isSubmitting || (modalMode === 'add' && isDuplicateEntry)">
+              {{ isSubmitting ? 'Menyimpan...' : 'Simpan' }}
             </button>
           </div>
         </form>
@@ -235,7 +262,6 @@ const deleteItem = async (item) => {
     </div>
   </div>
 </template>
-
 
 <style scoped>
 .card { background-color: #ffffff; border-radius: 8px; padding: 1.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
