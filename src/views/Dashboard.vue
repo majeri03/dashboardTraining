@@ -270,16 +270,7 @@ const iconPencapaian = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" view
       <div class="header-metrics-group">
         <TimeReminder />
 
-        <div v-if="isSatisfactionLoading" class="loading-small">Memuat metrik...</div>
-        <div v-if="!isSatisfactionLoading && satisfactionData" class="satisfaction-grid">
-          <RadialProgress :percentage="satisfactionData.pemateri" label="Pemateri" />
-          <RadialProgress :percentage="satisfactionData.materi" label="Materi" />
-          <RadialProgress :percentage="satisfactionData.waktu" label="Waktu" />
-          <RadialProgress :percentage="satisfactionData.fasilitas" label="Fasilitas" />
-          <RadialProgress :percentage="satisfactionData.perlengkapan" label="Perlengkapan" />
-          <RadialProgress :percentage="satisfactionData.manfaat" label="Manfaat" />
-          <RadialProgress :percentage="satisfactionData.konsumsi" label="Konsumsi" />
-        </div>
+        
       </div>
     </div>
 
@@ -349,6 +340,17 @@ const iconPencapaian = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" view
       </div>
     </div>
   </div>
+  <h2 class="section-title">Analisis Kepuasan Peserta</h2>
+  <div v-if="isSatisfactionLoading" class="loading-small">Memuat metrik...</div>
+        <div v-if="!isSatisfactionLoading && satisfactionData" class="satisfaction-grid">
+          <RadialProgress :percentage="satisfactionData.pemateri" label="Pemateri" />
+          <RadialProgress :percentage="satisfactionData.materi" label="Materi" />
+          <RadialProgress :percentage="satisfactionData.waktu" label="Waktu" />
+          <RadialProgress :percentage="satisfactionData.fasilitas" label="Fasilitas" />
+          <RadialProgress :percentage="satisfactionData.perlengkapan" label="Perlengkapan" />
+          <RadialProgress :percentage="satisfactionData.manfaat" label="Manfaat" />
+          <RadialProgress :percentage="satisfactionData.konsumsi" label="Konsumsi" />
+    </div>
 </div>
 
 
@@ -469,4 +471,14 @@ const iconPencapaian = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" view
   font-size: 0.9em;
   color: #6b7280;
 }
+.satisfaction-container {
+  padding: 2rem;
+}
+.satisfaction-grid {
+  display: flex;
+  justify-content: space-around;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
 </style>

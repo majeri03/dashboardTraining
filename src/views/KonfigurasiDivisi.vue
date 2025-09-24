@@ -34,7 +34,7 @@ onMounted(fetchData);
 
 const openModalForAdd = () => {
   modalMode.value = 'add';
-  currentItem.value = { divisi: '', jumlahkaryawan: 0 };
+  currentItem.value = { divisi: '' };
   modalError.value = '';
   isModalOpen.value = true;
 };
@@ -55,10 +55,6 @@ const closeModal = () => {
 const handleSubmit = async () => {
   if (!currentItem.value.divisi.trim()) {
     modalError.value = "Nama Divisi tidak boleh kosong.";
-    return;
-  }
-  if (currentItem.value.jumlahkaryawan <= 0) {
-    modalError.value = "Jumlah Karyawan harus lebih dari 0.";
     return;
   }
 
@@ -125,7 +121,6 @@ const deleteItem = async (item) => {
             <thead>
               <tr>
                 <th>Nama Divisi</th>
-                <th>Jumlah Karyawan</th>
                 <th>Aksi</th>
               </tr>
             </thead>
@@ -135,7 +130,6 @@ const deleteItem = async (item) => {
               </tr>
               <tr v-for="item in configDivisi" :key="item.divisi">
                 <td>{{ item.divisi }}</td>
-                <td>{{ item.jumlahkaryawan }}</td> 
                 <td class="action-buttons">
                   <button class="btn-edit" @click="openModalForEdit(item)">Edit</button>
                   <button class="btn-delete" @click="deleteItem(item)">Hapus</button>
@@ -154,10 +148,6 @@ const deleteItem = async (item) => {
           <div class="form-group">
             <label for="divisi">Nama Divisi</label>
             <input type="text" id="divisi" v-model="currentItem.divisi" required>
-          </div>
-          <div class="form-group">
-            <label for="jumlah">Jumlah Karyawan</label>
-            <input type="number" id="jumlah" v-model.number="currentItem.jumlahkaryawan" required min="1">
           </div>
           
           <div v-if="modalError" class="feedback error">{{ modalError }}</div>

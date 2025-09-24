@@ -22,35 +22,36 @@ const remainingDays = ref(endOfMonth.getDate() - today.getDate() + 1);
 
 <style scoped>
 .time-reminder-card {
-  background-color: #f8f9fa;
+  background-color: #fff;
   border-radius: 12px;
-  padding: 12px 16px;
+  padding: 1rem 1.5rem; /* Padding diperbesar */
   text-align: center;
   border: 1px solid #e5e7eb;
-  min-width: 140px;
+  min-width: 220px; /* Lebar minimum diperbesar */
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05);
 }
 .time-value {
-  font-size: 2em;
+  font-size: 3em; /* Ukuran font diperbesar */
   font-weight: 700;
   color: var(--primary-color, #d10000);
   line-height: 1.1;
 }
 .time-label {
-  font-size: 0.85em;
+  font-size: 1em; /* Ukuran font diperbesar */
   color: #6b7280;
   font-weight: 500;
-  margin-bottom: 8px;
+  margin-bottom: 12px; /* Margin bawah ditambah */
 }
 .time-progress-bar {
-  height: 6px;
+  height: 8px; /* Progress bar dibuat lebih tebal */
   background-color: #e5e7eb;
-  border-radius: 3px;
+  border-radius: 4px;
   overflow: hidden;
 }
 .time-progress-fill {
   height: 100%;
   background-color: var(--primary-color, #d10000);
-  border-radius: 3px;
+  border-radius: 4px;
   transition: width 0.5s ease-out;
 }
 </style>

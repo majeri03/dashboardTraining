@@ -7,6 +7,7 @@ const apiUrl = import.meta.env.VITE_API_URL;
 const tableHeaders = ref([
     { key: 'judulTraining', label: 'Judul Training', sortable: true },
     { key: 'kompetensiYangDilatih', label: 'Kompetensi', sortable: false },
+    { key: 'penyelenggara', label: 'Penyelenggara', sortable: true, isRating: false },
     { key: 'pemateri', label: 'Pemateri', sortable: true },
     { key: 'tanggalPelaksanaan', label: 'Tanggal', sortable: true },
     { key: 'durasiPelaksanaansatuanJam', label: 'Durasi (Jam)', sortable: true },

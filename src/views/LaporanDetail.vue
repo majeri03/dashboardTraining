@@ -86,7 +86,7 @@ const getDivisiInfo = (rincian, div) => {
 const exportToExcel = () => {
   const dataToExport = [];
   
-  const mainHeader = ['No', 'Nama Kegiatan', 'Jadwal', 'Tipe', 'PIC/Pemateri', 'Jml Peserta', 'Durasi (Jam)', 'Total Jam Training'];
+  const mainHeader = ['No', 'Nama Kegiatan', 'Jadwal', 'Tipe', 'Penyelenggara', 'Jml Peserta', 'Durasi (Jam)', 'Total Jam Training'];
   divisiHeaders.value.forEach(div => {
     mainHeader.push(div, '');
   });
@@ -197,7 +197,7 @@ const exportToPDF = () => {
     const headerRow1 = [
       { content: 'No', rowSpan: 2 }, { content: 'Nama Kegiatan', rowSpan: 2 },
       { content: 'Jadwal', rowSpan: 2 }, { content: 'Tipe', rowSpan: 2 },
-      { content: 'PIC/Pemateri', rowSpan: 2 }, { content: 'Jml Peserta', rowSpan: 2 },
+      { content: 'Penyelenggara', rowSpan: 2 }, { content: 'Jml Peserta', rowSpan: 2 },
       { content: 'Durasi (Jam)', rowSpan: 2 }, { content: 'Total Jam Training', rowSpan: 2 }
     ];
     divisiHeaders.value.forEach(div => {
@@ -305,7 +305,7 @@ const exportToPDF = () => {
             <th rowspan="2">Nama Kegiatan</th>
             <th rowspan="2">Jadwal</th>
             <th rowspan="2">Tipe</th>
-            <th rowspan="2">PIC/Pemateri</th>
+            <th rowspan="2">Penyelenggara</th>
             <th rowspan="2">Jml Peserta</th>
             <th rowspan="2">Durasi (Jam)</th>
             <th rowspan="2">Total Jam Training</th>
