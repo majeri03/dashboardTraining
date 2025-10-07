@@ -7,8 +7,8 @@ const apiUrl = import.meta.env.VITE_API_URL;
 const showNotification = inject('showNotification');
 
 // --- State ---
-const allConfigs = ref([]); // Menyimpan semua data konfigurasi dari server
-const allDivisions = ref([]); // Menyimpan daftar nama divisi
+const allConfigs = ref([]); 
+const allDivisions = ref([]); 
 const isLoading = ref(true);
 const error = ref(null);
 const isSubmitting = ref(false);
